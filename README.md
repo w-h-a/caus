@@ -39,3 +39,11 @@ Having the causal structure unlocks a roadmap:
 
 * We can use causal graphs to structure probabilistic inference to a few important causes of an ongoing incident instead of squinting at 'correlated' dashboards.
 * We can use causal graphs to ask 'what if' questions to structure our chaos engineering and determine our post-mortem action items instead of guessing.
+
+## The Data: Map vs Street
+
+`caus` works on aggregated data, whether that's aggregates from trace telemetry or metrics. The observability world is rightly obsessed with trace data---the raw, wide events that tell the story of a single request. `caus` does not replace that. 
+
+Traces are the street view; `caus` is the map. The process of aggregation is inherently lossy. The full context for why user #54321's request failed lives in the trace. But when the whole system is on fire, you don't need to look at a single house; you need a map of the city to find where the fire started.
+
+That is what `caus` does. It analyzes the macro-level signals to build a map of the system's causal structure. It gives you the hypothesis that tells you which street to look at. Then you can pull up your tracing tool and get the high-fidelity view of the specific requests if necessary. 
