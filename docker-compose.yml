@@ -1,0 +1,6 @@
+services:
+  python-server:
+    build:
+      context: ./worker
+    ports:
+      - "50051:50051"

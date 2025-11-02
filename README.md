@@ -20,7 +20,7 @@ It will tell you that the `checkout` latency spike didn't just happen. It was ca
 
 The Architecture
 
-* The Go gRPC Server: It takes a request with a list of your aggregated trace and metrics data and a past time window. It queries Prometheus for metrics and Clickhouse for trace data and fires it off to the Python gRPC Server.
+* The Go gRPC Client: It takes a request with a list of your aggregated trace and metrics data and a past time window. It queries Prometheus for metrics and Clickhouse for trace data and fires it off to the Python gRPC Server.
 * The Python gRPC Server: It gets the data and runs a time-series causal discovery algorithm (PCMCI) on it. It churns and sends back a graphical representation of your causal structure.
 * The `caus` CLI: The engineer runs:
 ```bash

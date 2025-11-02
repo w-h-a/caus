@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package causal.v1alpha1;
+
+option go_package = "github.com/w-h-a/caus/internal/client/causal";
+
+service CausalDiscovery {
+  rpc Discover(DiscoverRequest) returns (CausalGraph) {}
+}
+
+message DiscoverRequest {
+  string csv_data = 1;
+  int32 max_lag = 2;
+  float pc_alpha = 3;
+}
+
+message CausalGraph {
+  repeated Node nodes = 1;
+  repeated Edge edges = 2;
+}
+
+message Node {
+  int32 id = 1;
+  string label = 2;
+}
+
+message Edge {
+  string source = 1;
+  string target = 2;
+  string type = 3;
+  int32 lag = 4;
+}
