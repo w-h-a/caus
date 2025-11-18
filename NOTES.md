@@ -4,13 +4,15 @@
 
 The formal apparatus of causal modeling, as developed by Spirtes, Glymour, and Scheines, Pearl, and others, has provided a powerful framework for causal discovery and counterfactual prediction. This framework is built upon a precise, axiomatic connection between causality, usually represented as directed acyclic graphs, and joint probability distributions. The power of the framework lies in its ability to discover a class of causal structures from conditional independencies and to make predictions about the joint probability distribution under interventions on those structures. 
 
-The entire inferential edifice of causal modeling stands upon three main principles: the Causal Markov (CM) condition, the Causal Minimality (CMin) condition, and the Faithfulness condition. These conditions are posited as axioms or a set of assumptions any agent would do well to believe when making causal inferences. But this status of CM and CMin leaves the connection between probability and causality as an unexplained posit, justified primarily by its success or intuitive plausibility. This suffices for day-to-day practice but is lacking as grounds for causal modeling.
+The entire inferential edifice of causal modeling stands upon three main principles: the Causal Markov (CM) condition, the Causal Minimality (CMin) condition, and the Faithfulness condition. In the standard interventionist framework, these conditions are defended as a bundle of foundational assumptions--justified as being methodologically useful or intuitively plausible. While powerful, this leaves them without a coherent grounding.
 
 The issue with missing grounds upon which causal modeling rests is compounded by an older problem: the interpretation of probabilities. The Kolmogorov axioms provide a formal calculus, but their interpretation remains a matter of dispute. The standard (non-subjectivist) interpretations of probability are frequentist, logical, and propensity theories. Frequentists identify evidence for probabilities with the probabilities themselves, which is a mistake; so, this leaves logical and propensity theories.
 
-This paper argues that Abstract Object Theory (AOT), as detailed in the _Principia Logico-Metaphysica_ (PLM), provides a toolkit for grounding both probability and causality. At first glance, AOT invites a logical interpretation of probability. AOT provides a theory of possible worlds, defined as abstract objects that encode only propositional properties (e.g., _being such that_ $p$) and that possibly are such that all and only propositions they encode are true. Given this, one might attempt to define the probability of a proposition $p$ as a ratio of cardinalities of classes of possible worlds. This approach, however, turns out to be a non-starter in AOT since possible worlds are not discernible.
+This paper argues that Abstract Object Theory (AOT), as detailed in the _Principia Logico-Metaphysica_ (PLM), provides a toolkit for grounding both probability and causality. At first glance, AOT invites a logical interpretation of probability. AOT provides a theory of possible worlds, defined as abstract objects that encode only propositional properties (e.g., _being such that_ $p$) and that possibly are such that all and only propositions they encode are true. Given this, one might attempt to define the probability of a proposition $p$ as a ratio of cardinalities of classes of possible worlds. This approach, however, turns out to be a non-starter in AOT since possible worlds are not discernible in the manner required for extensional counting.
 
-Grounding both probability and causality in AOT, then, requires something like a propensity approach to probability, which understands probability to be a relation involving a generating setup, or, as we shall see, a situation and a proposition. This paper attempts to show that this is feasible, and then, building upon this, it will provide AOT grounds for _causal mechanism_, _intervention_, and _direct cause_. The central thesis is that, with this background work in hand, CM and CMin cease to be axioms. CM and CMin are theorems, derived from AOT, while Faithfulness is an expedient assumption for the practice of causal modeling.
+Grounding both probability and causality in AOT, then, requires something like a propensity approach to probability, which understands probability to be a relation involving a generating setup, or, as we shall see, a situation and a proposition. This paper attempts to show that this is feasible, and then, building upon this, it will provide grounding for _intervention_, _direct cause_ and _causal mechanism_. 
+
+The central thesis of this paper is one of reductive unification. We argue that by grounding concepts of _probability_, _intervention_, _direct cause_, and _causal mechanism_ in AOT, CM and CMin emerge not as independent axioms, but as theorems that follow from these concepts. The project is not to prove that the physical universe is Markovian, but to demonstrate the internal logical coherence of the interventionist framework itself, showing that CM and CMin are entailments of its core commitments. Faithfulness, by contrast, will be shown to be a non-derivable, contingent assumption.
 
 ## 2. Formal Preliminaries
 
@@ -75,11 +77,12 @@ So relative to $w$, $P!$ is a function because $\forall p \exists! r(P!w, p, r)$
 
 ###### 3.2.2 Axioms of Relativized $P!$
 
-We now show how these functions $\hat{f}_w$ are governed by Kolmogorov's axioms. We posit the first and third axioms as constraints on our primitive $P!$ relation, but we can derive the second axiom as a theorem from AOT when the first argument of $P!$ is fixed to $w$:
+We now show how these functions $\hat{f}_w$ are governed by Kolmogorov's axioms. We posit the Non-negativity and Additivity axioms as constraints on our primitive $P!$ relation. The Normalization axiom, however, can be derived as a theorem by positing a more fundamental bridge principle that explicitly connects AOT's encoding-as-truth machinery with our propends primitive $P!$.
 
 1. **Non-negativity (Posited):** $\forall p, r(P!w, p, r \rightarrow r \geq 0)$.
-2. **Normalization (Derived Theorem):** $P!w, \top, 1$, where $\top$ is the tautological proposition. Proof (Sketch): The tautological proposition $\top$ is a theorem in AOT; so, it is necessarily true: $\Box \top$. It is a theorem in AOT that $\Box p \equiv \forall w (w \models p)$. So, it follows that $\forall w (w \models \top)$. Since truth in a world is a deterministic fact, the $P!$ relation must be such that $w$ propends $\top$ with magnitude $1$.  
-3. **Additivity (Posited):** For any disjoint propositions $p_1$, $p_2$, if $P!w, p_1, r_1$ and $P!w, p_2, r_2$, then $P!w, p_1 \lor p_2, r_1 + r_2$.
+2. **Additivity (Posited):** For any disjoint propositions $p_1$, $p_2$, if $P!w, p_1, r_1$ and $P!w, p_2, r_2$, then $P!w, p_1 \lor p_2, r_1 + r_2$.
+3. **Bridge Principle (Posited):** $w \models p \rightarrow P!w, p, 1$. This axiom provides the link between AOT and the probability calculus. It states that if a possible world $w$ makes a proposition true, then the propensity for p relative to that world is 1.
+4. **Normalization (Derived Theorem):** $P!w, \top, 1$, where $\top$ is the tautological proposition. Proof (Sketch): The tautological proposition $\top$ is a theorem in AOT; so, it is necessarily true: $\Box \top$. It is a theorem in AOT that $\Box p \equiv \forall w (w \models p)$. So, it follows that $\forall w (w \models \top)$. From our Bridge Principle, it follows that $P!w, \top, 1$.  
 
 With this, we have successfully defined probability functions $\hat{f}_w$ and grounded them in our primitive propends $P!$ relation. In addition, we should extend this to conditional probability, as this will be important for what is to come.
 
@@ -104,9 +107,17 @@ There is no contradiction. $\hat{f}_w(p | q)$ is defined by a single value $r$, 
 
 ## 4. Interventionist Theory of Causality
 
-With a propensity theory of probability established, we now build upon it to ground an interventionist theory of causality. We shall formalize the central concepts of an interventionist theory--_causal mechanism_, _intervention_, and _direct cause_--within the current AOT framework.
+With a propensity theory of probability established, we now build upon it to ground an interventionist theory of causality. We shall formalize the central concepts of an interventionist theory--_intervention_, _direct cause_ and _causal mechanism_--within the current AOT framework. In what follows, it is convenient to take " $V = v$ " (the claim _that a variable takes a value_) to be another way of expressing a proposition.
 
-In the causal modeling literature, a mechanism is the process that determines the value (or probability distribution) of a variable from the value of its direct causes. In our AOT framework, this mechanism is the fact that a specific stable propends relation holds. In what follows, it is convenient to take " $V = v$ " (the claim _that a variable takes a value_) to be another way of expressing a proposition.
+**Intervention:** An intervention $I$ on $X$ with respect to $Y$, relative to ${\bf V}$, is an abstract relation (of type $\langle i, i\rangle$ guaranteed to exist by AOT's typed Comprehension Principle for abstract objects) that maps one possible world $w$ to another one $w'$, where
+1. $w' \models X = x$.
+2. $w \models p \equiv w' \models p$, with respect to every proposition concerning ${\bf V} \backslash \{X, Y\}$.
+
+Given this, we can define "direct cause".
+
+**Direct Cause:** A variable $X$ is a direct cause of variable $Y$ $(X \in \text{DC}(Y))$, relative to ${\bf V}$, if and only if there exists at least two distinct values $x_1, x_2$ for $X$ and some constant setting for all other variables $Z_1, ..., Z_n$ in ${\bf V} \backslash \{X, Y\}$ such that the probability of $Y$ differs between two corresponding worlds. That is, suppose we have world $w'$ resulting from an intervention on $X, Z_1, ..., Z_n$ with respect to $Y$ and world $w''$ resulting from an intervention on $X, Z_1, ..., Z_n$ with respect to $Y$ such that $w'$ and $w''$ differ only in the propositions they make true about $X$ (i.e., $X = x_1$ vs. $X = x_2$) with respect to ${\bf V} \backslash \{Y\}$. Then $X$ is a direct cause of $Y$ just in case $`\hat{f}_{w'}(Y = y) \neq \hat{f}_{w''}(Y = y)`$.
+
+In the causal modeling literature, a mechanism is the process that determines the value (or probability distribution) of a variable from the value of its direct causes. In our AOT framework, this mechanism is the fact that a specific stable propends relation holds. 
 
 **Causal Mechanism:** Let $X_1, ..., X_n$ be the direct causes of $Y$. Then 
 
@@ -114,26 +125,17 @@ $$
 p_{\text{mech}_Y} =_{df} [\lambda z \forall x_1, ..., x_n(\hat{f}_w(Y = y | X_1 = x_1, ..., X_n = x_n) = r)].
 $$ 
 
-The causal mechanism for $Y$ is _being such that the probability of_ $Y = y$ _given the direct causes of_ $Y$ _is_ $r$.
+The causal mechanism for $Y$ is _being such that the probability of_ $Y = y$ _given_ $X_1 = x_1, ..., X_n = x_n$ _is_ $r$.
 
-The definition of "causal mechanism" references the notion of _direct cause_. To ground that in AOT, we must first ground _intervention_.
+This definition grounds causal mechanism fully in AOT, but before moving on, we must make one more move. A core idea from the interventionist framework is modularity.
 
-The core of the interventionist account is the idea of surgical manipulation that sets the value of $X$ and, in so doing, makes the mechanism $p_{\text{mech}_X}$ that usually governs it no longer the case, while leaving all other mechanisms untouched. An intervention, then, is an abstract relation (of type $\langle i, i\rangle$ guaranteed to exist by AOT's typed Comprehension Principle for abstract objects) that maps one possible world $w$ to another one $w'$.
+**Modularity (Posited):** Causal mechanisms are modular in the sense that an intervention $I$ on $X$ with respect to $Y$, relative to ${\bf V}$ does not alter the causal mechanisms $`p_{\text{mech}_Z}`$ for any other variable $Z \in {\bf V} \backslash \{X\}$. That is, $`w' \models p_{\text{mech}_Z} \equiv w \models p_{\text{mech}_Z}`$, where $w'$ is the resulting intervention world.
 
-**Intervention:** An intervention $I$ is a relation such that $w \mapsto w'$, where $w'$ is the unique possible world where:
-1. $w' \models X = x$ (The proposition that $X$ has value is true in this world; the propends relation in this world is $P!w', X = x, 1$).
-2. $`w' \not\models p_{\text{mech}_X}`$ (The proposition $`p_{\text{mech}_X}`$ is _not_ true in this world).
-3. $`w' \models p_{\text{mech}_Z} \equiv w \models p_{\text{mech}_Z}`$ (For all $Z \in {\bf V}$ such that $Z \neq X$, the causal mechanism for $Z$ still holds).
-
-Given this, we can now define "direct cause". 
-
-**Direct Cause:** A variable $X$ is a direct cause of variable $Y$ relative to ${\bf V}$ if and only if there exists at least two distinct values $x_1, x_2$ for $X$ and some constant setting for all other variables $Z_1, ..., Z_n$ in ${\bf V}$ such that the probability of $Y$ differs between the two corresponding worlds. That is, if there are two possible worlds $w'$ and $w''$ resulting from two interventions from $w$ and differing only in $X = x_1$ and $X = x_2$, then $X$ is a direct cause of $Y$ just in case $`\hat{f}_{w'}(Y = y) \neq \hat{f}_{w''}(Y = y)`$.
-
-This definition grounds direct cause and causal mechanism fully in AOT; we have a non-circular link between causality and the propends relation $P!$.
+Note that this posited axiom governing causal mechanisms does not follow from the definition of "intervention". There, we said the two worlds do not differ with respect to propositions regarding ${\bf V}\backslash \{X, Y\}$. But with the modularity axiom, we have the stronger claim that the two worlds also do not differ on $p_{\text{mech}_Y}$.
 
 ## 5. Causal Markov, Causal Minimality, and Faithfulness
 
-This section derives the CM and CMin conditions as theorems from the definitions in sections 3 and 4 above and clarifies the status of Faithfulness within our AOT framework. 
+This section demonstrates that CM and CMin are theorems that follow from the definitions in the previous two sections. We also clarify the status of Faithfulness.
 
 #### 5.1. Deriving CM
 
@@ -143,9 +145,9 @@ $$
 \hat{f}_{w}(X | \text{DC}(X), \text{NE}(X)) = \hat{f}_w(X | \text{DC}(X))
 $$
 
-**Proof (Sketch):** The theorem follows from our AOT propensity theory of probability and the definition of "causal mechanism".
+**Proof (Analytic Entailment):** The theorem follows directly from our AOT-definition of "causal mechanism".
 
-1. The causal mechanism $p_{\text{mech}_X}$ is the proposition that governs the probability of $X$ in $w$ only as a function of its direct causes.
+1. The causal mechanism $p_{\text{mech}_X}$ is the proposition that the probability of $X$ in $w$ is only a function of $\text{DC}(X)$.
 
 2. The propensities generated by $w$ for any $X = x$ are therefore, by definition, sensitive only to the values of $\text{DC}(X)$.
 
@@ -153,7 +155,7 @@ $$
 
 4. Therefore, propositions about the values of $\text{NE}(X)$ are not part of $p_{\text{mech}_X}$.
 
-5. Because the propensities for $X$ are determined only by $p_{\text{mech}_X}$, adding information about $\text{NE}(X)$ to the conditioning set is irrelevant as the propensities for $X$ are fully determined by $\text{DC}(X)$.
+5. Because the propensities for $X$ are determined only by $p_{\text{mech}_X}$, adding information about $\text{NE}(X)$ to the conditioning set is irrelevant.
 
 6. Therefore, $\hat{f}_w(X | \text{DC}(X), \text{NE}(X)) = \hat{f}_w(X | \text{DC}(X))$.
 
@@ -161,7 +163,7 @@ $$
 
 CMin states that for any direct cause $X$ of $Y$, $X$ is not a redundant cause of $Y$. $X$ is a redundant cause of $Y$ if $Y$ is observationally independent of $X$ conditional on all of $Y$'s other direct causes. 
 
-**Proof (Sketch):** The theorem follows from AOT definitions of "direct cause", "intervention", and "causal mechanism".
+**Proof (Sketch):** The proof of this theorem demonstrates that our definitions are logically incompatible with a failure of CMin.
 
 1. Assume for contradiction that CMin is false.
 
@@ -179,8 +181,8 @@ CMin states that for any direct cause $X$ of $Y$, $X$ is not a redundant cause o
 
 8. Now we must bridge the interventional probabilities in step 7 with the observational probabilities in step 6.
     
-    a. By our definition of "intervention", the intervention world is such that the causal mechanism for $Y$ still holds.
-    
+    a. By our modularity axiom, the intervention world $w'$ is such that the causal mechanism for $Y$ still holds.
+
     b. By our definition of "causal mechanism", then, $\hat{f}_{w'}(Y | X, Z_1, ..., Z_n) = \hat{f}_w(Y|X, Z_1, ..., Z_n)$.
 
     c. In the intervention world $w'$, the values of $X$ and $Z_1, ..., Z_n$ are fixed. Therefore, the unconditional probability of $Y$ in $w'$ is, by definition, its probability conditional on those fixed facts: $`\hat{f}_{w'}(Y = y) = \hat{f}_{w'}(Y = y | X = x_1, Z_1 = z_1, ..., Z_n = z_n)`$.
@@ -203,6 +205,6 @@ This paper constructs a unified foundation for both probability and causality, o
 
 The first constructive thesis was the development of a two-level theory of probability. We posited a _primitive asymmetric propends_ relation $P!$ that holds between situations that represent generating conditions, propositions that represent outcomes, and a rational number. This relation was then used to define a collection of standard probability functions $\hat{f}_w$. This two-level structure was shown to provide a resolution to Humphreys's Paradox, by separating the asymmetric propends relation from the symmetric mathematics of probability.
 
-The second constructive thesis built directly upon this propensity theory of probability to formalize the interventionist account of causation and, most significantly, derive and clarify foundational axioms of modern causal modeling. We provided a definition of "causal mechanism", "intervention", and "direct cause" via AOT. Given this, CM was shown to be a theorem that follows from what "causal mechanism" and "probability" mean, CMin was likewise shown to be a theorem that follows from "direct cause", "intervention", and "causal mechanism", and, finally, the status of Faithfulness was clarified as a useful assumption in practice. 
+The second constructive thesis built directly upon this propensity theory of probability to formalize the interventionist account of causation. We provided a definition of "intervention", "direct cause", and "causal mechanism" via AOT. Given this, we demonstrated the _entailment_ of foundational principles of causal modeling.
 
-This work thus provides a reductive unification. The core principles linking probability and causality are not independent postulates. Instead, probability, causal mechanisms, and the formal principles of causal modeling have all been grounded in AOT.
+It is crucial to be precise about this contribution. To reiterate, the paper does not claim to have proven CM in a way that would satisfy critics, who question CM's application to physical systems. Rather, we have shown that CM and CMin are _consequences_ of definitions. The paper's contribution is therefore a reductive unification: it demonstrates _what one must accept_ to be an interventionist. It replaces a loose bundle of assumptions with a single foundation that demonstrates the internal logical coherence of the interventionist framework, while clarifying the separate, non-derivable status of Faithfulness.
