@@ -13,7 +13,7 @@ type mockFetcher struct {
 }
 
 func (f *mockFetcher) Fetch(ctx context.Context, metrics []string, start time.Time, end time.Time) ([]byte, error) {
-	csvData, err := os.ReadFile("test/testdata/sample_data.csv")
+	csvData, err := os.ReadFile("test/test_data/ground_truth.csv")
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %w", err)
 	}
