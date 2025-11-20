@@ -29,7 +29,8 @@ caus discover \
   --traces="checkout_latency,payment_errors,auth_latency" \
   --start="2025-10-29T03:00:00Z" \
   --end="2025-10-29T05:00:00Z" \
-  --max-lag="5m"
+  --max-lag=2 \
+  --alpha=0.05
 ```
 The output is a JSON object representing a causal graph.
 
