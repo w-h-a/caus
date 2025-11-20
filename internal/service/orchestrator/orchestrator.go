@@ -22,8 +22,8 @@ func (s *Service) RunAnalysis(ctx context.Context, metrics []string, start time.
 
 	req := &causal.DiscoverRequest{
 		CsvData: string(csvData),
-		MaxLag:  1,
-		PcAlpha: 0,
+		MaxLag:  2,
+		PcAlpha: 0.05,
 	}
 
 	graph, err := s.discoverer.Discover(ctx, req)
