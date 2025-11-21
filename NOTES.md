@@ -6,7 +6,7 @@ The formal apparatus of causal modeling, as developed by Spirtes, Glymour, and S
 
 The entire inferential edifice of causal modeling stands upon three main principles: the Causal Markov (CM) condition, the Causal Minimality (CMin) condition, and the Faithfulness condition. In the standard interventionist framework, these conditions are defended as a bundle of foundational assumptions--justified as methodologically useful or intuitively plausible. While powerful, this leaves them without a coherent grounding.
 
-The issue with missing grounds upon which causal modeling rests is compounded by an older problem: the interpretation of probabilities. The Kolmogorov axioms provide a formal calculus, but their interpretation remains a matter of dispute. The standard (non-subjectivist) interpretations of probability are frequentist, logical, and propensity theories. Frequentists identify evidence for probabilities with the probabilities themselves, which is a mistake; so, this leaves logical and propensity theories.
+The issue with missing grounds upon which causal modeling rests is compounded by an older problem: the interpretation of probabilities. The Kolmogorov axioms provide a formal calculus, but their interpretation remains a matter of dispute. The standard (non-subjectivist) interpretations of probability are frequentist, logical, and propensity theories. Frequentists identify evidence for probabilities with the probabilities themselves; so, this leaves logical and propensity theories.
 
 This paper argues that Abstract Object Theory (AOT), as detailed in the _Principia Logico-Metaphysica_ (PLM), provides a toolkit for grounding both probability and causality. At first glance, AOT invites a logical interpretation of probability. AOT provides a theory of possible worlds, defined as abstract objects that encode only propositional properties (e.g., _being such that_ $p$) and that possibly are such that all and only propositions they encode are true. Given this, one might attempt to define the probability of a proposition $p$ as a ratio of cardinalities of classes of possible worlds. This approach, however, is a non-starter in AOT since possible worlds are not discernible in the manner required for extensional counting.
 
@@ -123,7 +123,7 @@ In the causal modeling literature, a mechanism is the process that determines th
 **Causal Mechanism:** Let $X_1, ..., X_n$ be the direct causes of $Y$. Then 
 
 $$
-p_{\text{mech}_Y} =_{df} [\lambda z \forall x_1, ..., x_n(\hat{p}_w(Y = y | X_1 = x_1, ..., X_n = x_n) = r)].
+p_{\text{mech}_Y} =_{df} [\lambda z \forall y, x_1, ..., x_n \exists ! r(\hat{p}_w(Y = y | X_1 = x_1, ..., X_n = x_n) = r)].
 $$ 
 
 The causal mechanism for $Y$ is _being such that the probability of_ $Y = y$ _given_ $X_1 = x_1, ..., X_n = x_n$ _is_ $r$.
