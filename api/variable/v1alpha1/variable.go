@@ -22,7 +22,7 @@ type DiscoveryConfig struct {
 
 type VariableDefinition struct {
 	Name         string            `yaml:"name"`
-	Source       string            `yaml:"source"` // e.g., "prometheus", "clickhouse", etc
+	Source       string            `yaml:"source"` // e.g., "metrics", "traces"
 	MetricsQuery string            `yaml:"metrics_query,omitempty"`
 	TraceQuery   TraceQueryDetails `yaml:"trace_query,omitempty"`
 }

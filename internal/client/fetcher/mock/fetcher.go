@@ -2,23 +2,28 @@ package mock
 
 import (
 	"context"
-	"fmt"
-	"os"
+	"math/rand/v2"
 	"time"
 
+	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
 	"github.com/w-h-a/caus/internal/client/fetcher"
 )
 
 type mockFetcher struct {
 }
 
-func (f *mockFetcher) Fetch(ctx context.Context, metrics []string, start time.Time, end time.Time) ([]byte, error) {
-	csvData, err := os.ReadFile("test/test_data/ground_truth.csv")
-	if err != nil {
-		return nil, fmt.Errorf("failed to read file: %w", err)
+func (f *mockFetcher) Fetch(ctx context.Context, v variable.VariableDefinition, start time.Time, end time.Time, step time.Duration) (map[time.Time]float64, error) {
+	data := make(map[time.Time]float64)
+
+	curr := start.Truncate(step)
+	endTime := end.Truncate(step)
+
+	for !curr.After(endTime) {
+		data[curr] = rand.Float64() * 100
+		curr = curr.Add(step)
 	}
 
-	return csvData, nil
+	return data, nil
 }
 
 // TODO: options
