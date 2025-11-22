@@ -25,11 +25,11 @@ The Architecture
 * The `caus` CLI: The engineer runs:
 ```bash
 caus discover \
-  --metrics="redis_cpu" \
-  --traces="checkout_latency,payment_errors,auth_latency" \
+  --vars="/path/to/vars.yml" \
   --start="2025-10-29T03:00:00Z" \
   --end="2025-10-29T05:00:00Z" \
-  --max-lag=2 \
+  --step="1m" \
+  --max-lag=3 \
   --alpha=0.05
 ```
 The output is a JSON object representing a causal graph.

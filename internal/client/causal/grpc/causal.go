@@ -4,13 +4,14 @@ import (
 	"context"
 	"time"
 
-	"github.com/w-h-a/caus/internal/client/causal"
+	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
+	discoverer "github.com/w-h-a/caus/internal/client/causal"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 type grpcDiscoverer struct {
-	client causal.CausalDiscoveryClient
+	client discoverer.CausalDiscoveryClient
 }
 
 func (d *grpcDiscoverer) Discover(ctx context.Context, req *causal.DiscoverRequest) (*causal.CausalGraph, error) {
@@ -21,13 +22,13 @@ func (d *grpcDiscoverer) Discover(ctx context.Context, req *causal.DiscoverReque
 }
 
 // TODO: options (addr)
-func NewDiscoverer() causal.Discoverer {
+func NewDiscoverer() discoverer.Discoverer {
 	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
 
-	c := causal.NewCausalDiscoveryClient(conn)
+	c := discoverer.NewCausalDiscoveryClient(conn)
 
 	d := &grpcDiscoverer{
 		client: c,

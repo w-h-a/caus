@@ -1,0 +1,17 @@
+variables:
+  - name: "checkout_latency"
+    source: 
+      type: "traces"
+      impl: "clickhouse"
+      loc: "clickhouse:8080"
+    trace_query:
+      service: "checkout"
+      dimension: "duration"
+      aggregation: "p99"
+
+  - name: "db_cpu"
+    source:
+      type: "metrics"
+      impl: "prometheus"
+      loc: "prometheus:9000"
+    metrics_query: "container_cpu_utilization_ratio{name=db}"

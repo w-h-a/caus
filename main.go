@@ -1,66 +1,62 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
+	"os"
 	"time"
 
-	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
-	"github.com/w-h-a/caus/internal/client/causal"
-	"github.com/w-h-a/caus/internal/client/causal/grpc"
-	mock "github.com/w-h-a/caus/internal/client/fetcher/mock"
-	"github.com/w-h-a/caus/internal/service/orchestrator"
+	"github.com/urfave/cli/v2"
+	"github.com/w-h-a/caus/cmd"
 )
 
 func main() {
-	log.Println("Starting causal discovery...")
-
-	ctx := context.Background()
-
-	log.Println("Building clients...")
-
-	// TODO: use env var to determine metrics source and traces source
-	mockMetricsFetcher := mock.NewFetcher()
-	mockTracesFetcher := mock.NewFetcher()
-	grpcDiscoverer := grpc.NewDiscoverer()
-
-	log.Println("Building core service...")
-
-	o := orchestrator.New(mockMetricsFetcher, mockTracesFetcher, grpcDiscoverer)
-
-	log.Println("Running analysis...")
-
-	graph, err := o.Do(
-		ctx,
-		[]variable.VariableDefinition{},
-		time.Now().Add(-1*time.Hour),
-		time.Now(),
-		time.Duration(1*time.Hour),
-		orchestrator.AnalysisArgs{},
-	)
-	if err != nil {
-		log.Fatalf("Error running analysis: %v", err)
+	app := &cli.App{
+		Name:  "caus",
+		Usage: "Causal discovery for your metrics and trace aggregates",
+		Commands: []*cli.Command{
+			{
+				Name: "discover",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "vars",
+						Aliases:  []string{"v"},
+						Usage:    "Path to vars.yml config",
+						Required: true,
+					},
+					&cli.StringFlag{
+						Name:    "start",
+						Aliases: []string{"s"},
+						Usage:   "Start time (RFC3339)",
+						Value:   time.Now().Add(-1 * time.Hour).Format(time.RFC3339),
+					},
+					&cli.StringFlag{
+						Name:    "end",
+						Aliases: []string{"e"},
+						Usage:   "End time (RFC3339)",
+						Value:   time.Now().Format(time.RFC3339),
+					},
+					&cli.DurationFlag{
+						Name:  "step",
+						Usage: "Data resolution (e.g., 1m, 15s)",
+						Value: time.Minute,
+					},
+					&cli.IntFlag{
+						Name:  "lag",
+						Usage: "Max causal lag to check",
+						Value: 3,
+					},
+					&cli.Float64Flag{
+						Name:  "alpha",
+						Usage: "Significance level (e.g., 0.05)",
+						Value: 0.05,
+					},
+				},
+				Action: cmd.Run,
+			},
+		},
 	}
 
-	log.Println("Causal discovery completed")
-
-	printGraph(graph)
-}
-
-func printGraph(graph *causal.CausalGraph) {
-	fmt.Println("\n--- Causal Graph Results ---")
-	fmt.Println("Nodes:")
-	for _, node := range graph.Nodes {
-		fmt.Printf("  - %s\n", node.Label)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
 	}
-	fmt.Println("\nDiscovered Edges:")
-	if len(graph.Edges) == 0 {
-		fmt.Println("  No causal edges were found.")
-	} else {
-		for _, edge := range graph.Edges {
-			fmt.Printf("  - %s --> %s (lag: %d)\n", edge.Source, edge.Target, edge.Lag)
-		}
-	}
-	fmt.Println("--------------------------")
 }
