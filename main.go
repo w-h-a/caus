@@ -8,7 +8,7 @@ import (
 
 	"github.com/w-h-a/caus/internal/client/causal"
 	"github.com/w-h-a/caus/internal/client/causal/grpc"
-	mockmetrics "github.com/w-h-a/caus/internal/client/metrics/mock"
+	mockmetrics "github.com/w-h-a/caus/internal/client/fetcher/mock"
 	"github.com/w-h-a/caus/internal/service/orchestrator"
 )
 
