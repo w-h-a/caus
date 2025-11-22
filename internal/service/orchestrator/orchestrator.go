@@ -9,15 +9,16 @@ import (
 	"strconv"
 	"time"
 
+	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
 	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
-	"github.com/w-h-a/caus/internal/client/causal"
+	discoverer "github.com/w-h-a/caus/internal/client/causal"
 	"github.com/w-h-a/caus/internal/client/fetcher"
 )
 
 type Service struct {
 	metricsFetcher fetcher.Fetcher
 	tracesFetcher  fetcher.Fetcher
-	discoverer     causal.Discoverer
+	discoverer     discoverer.Discoverer
 }
 
 func (s *Service) Do(
@@ -28,11 +29,13 @@ func (s *Service) Do(
 	step time.Duration,
 	analysisArgs AnalysisArgs,
 ) (*causal.CausalGraph, error) {
+	// 1. fetch and stitch
 	csvData, err := s.fetch(ctx, vars, start, end, step)
 	if err != nil {
 		return nil, err
 	}
 
+	// 2. discover direct causes
 	graph, err := s.discover(ctx, csvData, analysisArgs)
 	if err != nil {
 		return nil, err
@@ -42,14 +45,14 @@ func (s *Service) Do(
 }
 
 func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition, start time.Time, end time.Time, step time.Duration) ([]byte, error) {
-	// 1. Scatter: Fetch all series
 	results := make(map[string]map[time.Time]float64)
 
+	// 1. scatter
 	for _, v := range vars {
-		log.Printf("ORCHESTRATOR: Fetching '%s' from %s...", v.Name, v.Source)
+		log.Printf("ORCHESTRATOR: Fetching '%s' from %s...", v.Name, v.Source.Loc)
 
 		var dataFetcher fetcher.Fetcher
-		switch v.Source {
+		switch v.Source.Type {
 		case "metrics":
 			dataFetcher = s.metricsFetcher
 		case "traces":
@@ -66,7 +69,7 @@ func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition,
 		results[v.Name] = series
 	}
 
-	// 2. Gather & Stitch: Align everything to the exact timestamps requested
+	// 2. stitch
 	var buf bytes.Buffer
 	writer := csv.NewWriter(&buf)
 
@@ -103,7 +106,9 @@ func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition,
 	}
 
 	writer.Flush()
-	return buf.Bytes(), nil
+	bs := buf.Bytes()
+
+	return bs, nil
 }
 
 func (s *Service) discover(ctx context.Context, csvData []byte, analysis AnalysisArgs) (*causal.CausalGraph, error) {
@@ -121,7 +126,7 @@ func (s *Service) discover(ctx context.Context, csvData []byte, analysis Analysi
 	return graph, nil
 }
 
-func New(m fetcher.Fetcher, t fetcher.Fetcher, d causal.Discoverer) *Service {
+func New(m fetcher.Fetcher, t fetcher.Fetcher, d discoverer.Discoverer) *Service {
 	return &Service{
 		metricsFetcher: m,
 		tracesFetcher:  t,

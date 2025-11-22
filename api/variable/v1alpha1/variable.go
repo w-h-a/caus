@@ -6,6 +6,11 @@ import (
 )
 
 var (
+	SupportedImplementations = map[string][]string{
+		"metrics": {"mock"},
+		"traces":  {"mock"},
+	}
+
 	SupportedDimensions = []string{"calls", "duration"}
 
 	SupportedAggregations = map[string][]string{
@@ -21,22 +26,28 @@ type DiscoveryConfig struct {
 }
 
 type VariableDefinition struct {
-	Name         string            `yaml:"name"`
-	Source       string            `yaml:"source"` // e.g., "metrics", "traces"
-	MetricsQuery string            `yaml:"metrics_query,omitempty"`
-	TraceQuery   TraceQueryDetails `yaml:"trace_query,omitempty"`
+	Name         string             `yaml:"name"`
+	Source       *Source            `yaml:"source"`
+	MetricsQuery string             `yaml:"metrics_query,omitempty"`
+	TraceQuery   *TraceQueryDetails `yaml:"trace_query,omitempty"`
+}
+
+type Source struct {
+	Type string `yaml:"type"` // e.g., "metrics", "traces"
+	Impl string `yaml:"impl"` // e.g., "prometheus", "clickhouse", "honeycomb", "datadog", etc
+	Loc  string `yaml:"loc"`
 }
 
 type TraceQueryDetails struct {
 	ServiceName       string           `yaml:"service"`
+	Dimension         string           `yaml:"dimension"` // e.g., "duration", "calls", etc
+	AggregationOption string           `yaml:"aggregation"`
 	SpanName          string           `yaml:"span_name,omitempty"`
 	SpanKind          string           `yaml:"span_kind,omitempty"`
-	Dimension         string           `yaml:"dimension"` // e.g., "duration", "calls", etc
-	AggregationOption string           `yaml:"aggregation,omitempty"`
 	AttributeQueries  []AttributeQuery `yaml:"attribute_queries,omitempty"`
 }
 
-func (t TraceQueryDetails) Validate() error {
+func (t *TraceQueryDetails) Validate() error {
 	if t.ServiceName == "" {
 		return fmt.Errorf("service name is required")
 	}
