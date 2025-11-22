@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/w-h-a/caus/internal/client/metrics"
+	"github.com/w-h-a/caus/internal/client/fetcher"
 )
 
 type mockFetcher struct {
@@ -22,7 +22,7 @@ func (f *mockFetcher) Fetch(ctx context.Context, metrics []string, start time.Ti
 }
 
 // TODO: options
-func NewFetcher() metrics.Fetcher {
+func NewFetcher() fetcher.Fetcher {
 	f := &mockFetcher{}
 
 	return f

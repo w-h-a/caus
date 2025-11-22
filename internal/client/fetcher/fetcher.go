@@ -1,4 +1,4 @@
-package metrics
+package fetcher
 
 import (
 	"context"

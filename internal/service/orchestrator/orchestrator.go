@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/w-h-a/caus/internal/client/causal"
-	"github.com/w-h-a/caus/internal/client/metrics"
+	"github.com/w-h-a/caus/internal/client/fetcher"
 )
 
 type Service struct {
-	metricsFetcher metrics.Fetcher
+	metricsFetcher fetcher.Fetcher
 	discoverer     causal.Discoverer
 }
 
@@ -34,9 +34,9 @@ func (s *Service) RunAnalysis(ctx context.Context, metrics []string, start time.
 	return graph, nil
 }
 
-func New(f metrics.Fetcher, d causal.Discoverer) *Service {
+func New(m fetcher.Fetcher, d causal.Discoverer) *Service {
 	return &Service{
-		metricsFetcher: f,
+		metricsFetcher: m,
 		discoverer:     d,
 	}
 }
