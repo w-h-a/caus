@@ -4,12 +4,10 @@
 // - protoc             v3.21.9
 // source: causal.proto
 
-package discoverer
+package v1alpha1
 
 import (
 	context "context"
-
-	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -24,7 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CausalDiscoveryClient interface {
-	Discover(ctx context.Context, in *causal.DiscoverRequest, opts ...grpc.CallOption) (*causal.CausalGraph, error)
+	Discover(ctx context.Context, in *DiscoverRequest, opts ...grpc.CallOption) (*CausalGraph, error)
 }
 
 type causalDiscoveryClient struct {
@@ -35,8 +33,8 @@ func NewCausalDiscoveryClient(cc grpc.ClientConnInterface) CausalDiscoveryClient
 	return &causalDiscoveryClient{cc}
 }
 
-func (c *causalDiscoveryClient) Discover(ctx context.Context, in *causal.DiscoverRequest, opts ...grpc.CallOption) (*causal.CausalGraph, error) {
-	out := new(causal.CausalGraph)
+func (c *causalDiscoveryClient) Discover(ctx context.Context, in *DiscoverRequest, opts ...grpc.CallOption) (*CausalGraph, error) {
+	out := new(CausalGraph)
 	err := c.cc.Invoke(ctx, "/causal.v1alpha1.CausalDiscovery/Discover", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -48,7 +46,7 @@ func (c *causalDiscoveryClient) Discover(ctx context.Context, in *causal.Discove
 // All implementations must embed UnimplementedCausalDiscoveryServer
 // for forward compatibility
 type CausalDiscoveryServer interface {
-	Discover(context.Context, *causal.DiscoverRequest) (*causal.CausalGraph, error)
+	Discover(context.Context, *DiscoverRequest) (*CausalGraph, error)
 	mustEmbedUnimplementedCausalDiscoveryServer()
 }
 
@@ -56,7 +54,7 @@ type CausalDiscoveryServer interface {
 type UnimplementedCausalDiscoveryServer struct {
 }
 
-func (UnimplementedCausalDiscoveryServer) Discover(context.Context, *causal.DiscoverRequest) (*causal.CausalGraph, error) {
+func (UnimplementedCausalDiscoveryServer) Discover(context.Context, *DiscoverRequest) (*CausalGraph, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Discover not implemented")
 }
 func (UnimplementedCausalDiscoveryServer) mustEmbedUnimplementedCausalDiscoveryServer() {}
@@ -73,7 +71,7 @@ func RegisterCausalDiscoveryServer(s grpc.ServiceRegistrar, srv CausalDiscoveryS
 }
 
 func _CausalDiscovery_Discover_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(causal.DiscoverRequest)
+	in := new(DiscoverRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -85,7 +83,7 @@ func _CausalDiscovery_Discover_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/causal.v1alpha1.CausalDiscovery/Discover",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CausalDiscoveryServer).Discover(ctx, req.(*causal.DiscoverRequest))
+		return srv.(CausalDiscoveryServer).Discover(ctx, req.(*DiscoverRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
