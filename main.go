@@ -6,9 +6,10 @@ import (
 	"log"
 	"time"
 
+	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
 	"github.com/w-h-a/caus/internal/client/causal"
 	"github.com/w-h-a/caus/internal/client/causal/grpc"
-	mockmetrics "github.com/w-h-a/caus/internal/client/fetcher/mock"
+	mock "github.com/w-h-a/caus/internal/client/fetcher/mock"
 	"github.com/w-h-a/caus/internal/service/orchestrator"
 )
 
@@ -19,16 +20,25 @@ func main() {
 
 	log.Println("Building clients...")
 
-	mockMetricsFetcher := mockmetrics.NewFetcher()
+	// TODO: use env var to determine metrics source and traces source
+	mockMetricsFetcher := mock.NewFetcher()
+	mockTracesFetcher := mock.NewFetcher()
 	grpcDiscoverer := grpc.NewDiscoverer()
 
 	log.Println("Building core service...")
 
-	o := orchestrator.New(mockMetricsFetcher, grpcDiscoverer)
+	o := orchestrator.New(mockMetricsFetcher, mockTracesFetcher, grpcDiscoverer)
 
 	log.Println("Running analysis...")
 
-	graph, err := o.RunAnalysis(ctx, []string{}, time.Now().Add(-1*time.Hour), time.Now())
+	graph, err := o.Do(
+		ctx,
+		[]variable.VariableDefinition{},
+		time.Now().Add(-1*time.Hour),
+		time.Now(),
+		time.Duration(1*time.Hour),
+		orchestrator.AnalysisArgs{},
+	)
 	if err != nil {
 		log.Fatalf("Error running analysis: %v", err)
 	}
