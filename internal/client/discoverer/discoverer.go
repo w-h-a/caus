@@ -1,4 +1,4 @@
-package causal
+package discoverer
 
 import (
 	"context"

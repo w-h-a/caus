@@ -3,8 +3,8 @@
 gen-proto-go:
 	@echo "Generating Go gRPC code..."
 	@protoc --proto_path=api/causal/v1alpha1 \
-		--go_out=./internal/client/causal --go_opt=paths=source_relative \
-		--go-grpc_out=./internal/client/causal --go-grpc_opt=paths=source_relative \
+		--go_out=./internal/client/discoverer --go_opt=paths=source_relative \
+		--go-grpc_out=./internal/client/discoverer --go-grpc_opt=paths=source_relative \
 		causal.proto
 
 gen-proto-py:

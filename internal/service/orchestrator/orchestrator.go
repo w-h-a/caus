@@ -11,7 +11,7 @@ import (
 
 	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
 	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
-	discoverer "github.com/w-h-a/caus/internal/client/causal"
+	"github.com/w-h-a/caus/internal/client/discoverer"
 	"github.com/w-h-a/caus/internal/client/fetcher"
 )
 

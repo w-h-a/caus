@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package causal.v1alpha1;
 
-option go_package = "github.com/w-h-a/caus/internal/client/causal";
+option go_package = "github.com/w-h-a/caus/internal/client/discoverer";
 
 service CausalDiscovery {
   rpc Discover(DiscoverRequest) returns (CausalGraph) {}

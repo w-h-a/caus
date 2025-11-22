@@ -4,7 +4,7 @@
 // - protoc             v3.21.9
 // source: causal.proto
 
-package causal
+package discoverer
 
 import (
 	context "context"
