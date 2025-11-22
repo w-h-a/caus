@@ -7,7 +7,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
-	"github.com/w-h-a/caus/internal/client/causal/grpc"
+	"github.com/w-h-a/caus/internal/client/discoverer/grpc"
 	"github.com/w-h-a/caus/internal/client/fetcher/mock"
 	"github.com/w-h-a/caus/internal/config"
 	"github.com/w-h-a/caus/internal/service/orchestrator"

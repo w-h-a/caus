@@ -5,7 +5,7 @@ import (
 	"time"
 
 	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
-	discoverer "github.com/w-h-a/caus/internal/client/causal"
+	"github.com/w-h-a/caus/internal/client/discoverer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
