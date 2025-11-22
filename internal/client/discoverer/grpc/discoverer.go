@@ -11,7 +11,7 @@ import (
 )
 
 type grpcDiscoverer struct {
-	client discoverer.CausalDiscoveryClient
+	client causal.CausalDiscoveryClient
 }
 
 func (d *grpcDiscoverer) Discover(ctx context.Context, req *causal.DiscoverRequest) (*causal.CausalGraph, error) {
@@ -28,7 +28,7 @@ func NewDiscoverer() discoverer.Discoverer {
 		panic(err)
 	}
 
-	c := discoverer.NewCausalDiscoveryClient(conn)
+	c := causal.NewCausalDiscoveryClient(conn)
 
 	d := &grpcDiscoverer{
 		client: c,
