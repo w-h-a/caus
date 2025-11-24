@@ -16,9 +16,8 @@ import (
 )
 
 type Service struct {
-	metricsFetcher fetcher.Fetcher
-	tracesFetcher  fetcher.Fetcher
-	discoverer     discoverer.Discoverer
+	fetchers   map[string]map[string]fetcher.Fetcher
+	discoverer discoverer.Discoverer
 }
 
 func (s *Service) Do(
@@ -52,13 +51,15 @@ func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition,
 		log.Printf("ORCHESTRATOR: Fetching '%s' from %s...", v.Name, v.Source.Loc)
 
 		var dataFetcher fetcher.Fetcher
-		switch v.Source.Type {
-		case "metrics":
-			dataFetcher = s.metricsFetcher
-		case "traces":
-			dataFetcher = s.tracesFetcher
-		default:
-			return nil, fmt.Errorf("unknown source type '%s' for variable '%s'", v.Source, v.Name)
+
+		impls, ok := s.fetchers[v.Source.Type]
+		if !ok {
+			return nil, fmt.Errorf("unknown source type '%s' for variable '%s'", v.Source.Type, v.Name)
+		}
+
+		dataFetcher, ok = impls[v.Source.Impl]
+		if !ok {
+			return nil, fmt.Errorf("unknown %s implementation '%s' for variable '%s'", v.Source.Type, v.Source.Impl, v.Name)
 		}
 
 		series, err := dataFetcher.Fetch(ctx, v, start, end, step)
@@ -126,10 +127,9 @@ func (s *Service) discover(ctx context.Context, csvData []byte, analysis Analysi
 	return graph, nil
 }
 
-func New(m fetcher.Fetcher, t fetcher.Fetcher, d discoverer.Discoverer) *Service {
+func New(fs map[string]map[string]fetcher.Fetcher, d discoverer.Discoverer) *Service {
 	return &Service{
-		metricsFetcher: m,
-		tracesFetcher:  t,
-		discoverer:     d,
+		fetchers:   fs,
+		discoverer: d,
 	}
 }

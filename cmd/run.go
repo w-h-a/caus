@@ -8,6 +8,7 @@ import (
 	"github.com/urfave/cli/v2"
 	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
 	"github.com/w-h-a/caus/internal/client/discoverer/grpc"
+	"github.com/w-h-a/caus/internal/client/fetcher"
 	"github.com/w-h-a/caus/internal/client/fetcher/mock"
 	"github.com/w-h-a/caus/internal/config"
 	"github.com/w-h-a/caus/internal/service/orchestrator"
@@ -37,12 +38,23 @@ func Run(c *cli.Context) error {
 
 	// 2. Build clients
 	// TODO: choose based on config
-	mockMetricsFetcher := mock.NewFetcher()
-	mockTracesFetcher := mock.NewFetcher()
+	mockFetcher := mock.NewFetcher()
+
+	fetchers := map[string]map[string]fetcher.Fetcher{
+		"metrics": {
+			"mock":       mockFetcher,
+			"prometheus": mockFetcher,
+		},
+		"traces": {
+			"mock":       mockFetcher,
+			"clickhouse": mockFetcher,
+		},
+	}
+
 	grpcDiscoverer := grpc.NewDiscoverer()
 
 	// 3. Build services
-	o := orchestrator.New(mockMetricsFetcher, mockTracesFetcher, grpcDiscoverer)
+	o := orchestrator.New(fetchers, grpcDiscoverer)
 
 	// 4. Do it
 	graph, err := o.Do(
