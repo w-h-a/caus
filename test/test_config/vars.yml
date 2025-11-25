@@ -1,17 +1,27 @@
 variables:
-  - name: "checkout_latency"
+  - name: "front_latency"
     source: 
       type: "traces"
       impl: "clickhouse"
-      loc: "clickhouse:8080"
+      loc: "tcp://localhost:9000"
     trace_query:
-      service: "checkout"
+      service: "front"
       dimension: "duration"
-      aggregation: "p99"
+      aggregation: "p95"
+  
+  - name: "front_calls"
+    source:
+      type: "traces"
+      impl: "clickhouse"
+      loc: "tcp://localhost:9000"
+    trace_query:
+      service: "front"
+      dimension: "calls"
+      aggregation: "count"
 
-  - name: "db_cpu"
+  - name: "orders_cpu"
     source:
       type: "metrics"
       impl: "prometheus"
-      loc: "prometheus:9000"
-    metrics_query: "container_cpu_utilization_ratio{name=db}"
+      loc: "http://localhost:9090"
+    metrics_query: "container_cpu_utilization_ratio{container_name='orders'}"
