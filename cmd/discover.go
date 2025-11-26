@@ -33,7 +33,7 @@ func Discover(c *cli.Context) error {
 	end := now.Add(-1 * c.Duration("end"))
 	step := c.Duration("step")
 
-	args := orchestrator.AnalysisArgs{
+	args := orchestrator.DiscoveryArgs{
 		MaxLag:  int32(c.Int("lag")),
 		PcAlpha: float32(c.Float64("alpha")),
 	}

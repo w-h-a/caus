@@ -28,7 +28,7 @@ caus discover \
 ```
 The output is a textual representation of the causal graph.
 
-### The Flight Simulator (WIP)
+### The Flight Simulator
 
 We also built a counterfactual prediction engine. You feed it the causal graph, select a historical time window, and ask a "What Would Happen If?" question. It allows you to test remediation strategies without touching production. It will tell you: "if we had increased `frontend` calls by 20% during yesterday's traffic spike, `orders` cpu would have spiked to 100% and crashed. This turns our post-mortem action items from guesses into rigorous predictions.
 
