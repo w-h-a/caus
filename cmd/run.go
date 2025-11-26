@@ -8,6 +8,7 @@ import (
 	"github.com/urfave/cli/v2"
 	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
 	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
+	"github.com/w-h-a/caus/internal/client/discoverer"
 	"github.com/w-h-a/caus/internal/client/discoverer/grpc"
 	"github.com/w-h-a/caus/internal/client/fetcher"
 	"github.com/w-h-a/caus/internal/client/fetcher/clickhouse"
@@ -46,7 +47,10 @@ func Run(c *cli.Context) error {
 		return err
 	}
 
-	grpcDiscoverer := grpc.NewDiscoverer()
+	// TODO: pass in discoverer config and location via cli or expand variable cfg
+	grpcDiscoverer := grpc.NewDiscoverer(
+		discoverer.WithLocation("localhost:50051"),
+	)
 
 	// 3. Build services
 	o := orchestrator.New(fetchers, grpcDiscoverer)
