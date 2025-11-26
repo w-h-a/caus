@@ -12,9 +12,9 @@ Your chaos engineering is just chaos. You're not a scientist testing a hypothesi
 
 `caus` discovers the causal structure of aggregated trace telemetry and metrics. Once you have this, it unlocks so much.
 
-### Stage 1: The Flight Recorder (WIP)
+### Stage 1: The Flight Recorder
 
-We are building an offline, command-line tool for after the incident. You feed it data from during the incident, you go make coffee, and when you come back it will present the causal structure of what burned down your system.
+We built an offline, command-line tool for after the incident. You feed it data from during the incident, you go make coffee, and when you come back it will present the causal structure of what burned down your system.
 
 It will tell you that the `checkout` latency spike didn't just happen. It was caused by the `payment` error rate, which was caused by a spike in `auth` latency 4 minutes earlier. 
 
@@ -32,14 +32,11 @@ caus discover \
   --max-lag=3 \
   --alpha=0.05
 ```
-The output is a JSON object representing a causal graph.
+The output is a textual representation of the causal graph.
 
-### Stages 2 & 3: The Co-Pilot & Flight Simulator
+### Stage 2: The Flight Simulator (Next)
 
-Having the causal structure unlocks a roadmap:
-
-* We can use causal graphs to structure probabilistic inference to a few important causes of an ongoing incident instead of squinting at 'correlated' dashboards.
-* We can use causal graphs to ask 'what if' questions to structure our chaos engineering and determine our post-mortem action items instead of guessing.
+We can use causal graphs and the data to ask 'what if' questions to structure our chaos engineering and determine our post-mortem action items instead of guessing.
 
 ## The Data: Map vs Street
 
