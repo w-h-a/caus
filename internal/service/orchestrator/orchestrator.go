@@ -20,7 +20,7 @@ type Service struct {
 	discoverer discoverer.Discoverer
 }
 
-func (s *Service) Do(
+func (s *Service) Discover(
 	ctx context.Context,
 	vars []variable.VariableDefinition,
 	start time.Time,

@@ -18,7 +18,7 @@ import (
 	"github.com/w-h-a/caus/internal/service/orchestrator"
 )
 
-func Run(c *cli.Context) error {
+func Discover(c *cli.Context) error {
 	ctx := c.Context
 
 	// 1. Parse vars.yml
@@ -55,8 +55,8 @@ func Run(c *cli.Context) error {
 	// 3. Build services
 	o := orchestrator.New(fetchers, grpcDiscoverer)
 
-	// 4. Do it
-	graph, err := o.Do(
+	// 4. Run Discover
+	graph, err := o.Discover(
 		ctx,
 		cfg.Variables,
 		start,
