@@ -23,17 +23,17 @@ func main() {
 						Usage:    "Path to vars.yml config",
 						Required: true,
 					},
-					&cli.StringFlag{
+					&cli.DurationFlag{
 						Name:    "start",
 						Aliases: []string{"s"},
-						Usage:   "Start time (RFC3339)",
-						Value:   time.Now().Add(-1 * time.Hour).Format(time.RFC3339),
+						Usage:   "How long ago to start (e.g., '2h', '30m')",
+						Value:   2 * time.Hour,
 					},
-					&cli.StringFlag{
+					&cli.DurationFlag{
 						Name:    "end",
 						Aliases: []string{"e"},
-						Usage:   "End time (RFC3339)",
-						Value:   time.Now().Format(time.RFC3339),
+						Usage:   "How long ago to end (e.g., '0m' for now)",
+						Value:   0,
 					},
 					&cli.DurationFlag{
 						Name:  "step",

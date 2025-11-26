@@ -7,9 +7,12 @@ import (
 
 	"github.com/urfave/cli/v2"
 	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
+	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
 	"github.com/w-h-a/caus/internal/client/discoverer/grpc"
 	"github.com/w-h-a/caus/internal/client/fetcher"
+	"github.com/w-h-a/caus/internal/client/fetcher/clickhouse"
 	"github.com/w-h-a/caus/internal/client/fetcher/mock"
+	"github.com/w-h-a/caus/internal/client/fetcher/prometheus"
 	"github.com/w-h-a/caus/internal/config"
 	"github.com/w-h-a/caus/internal/service/orchestrator"
 )
@@ -24,8 +27,9 @@ func Run(c *cli.Context) error {
 		return fmt.Errorf("loading config: %w", err)
 	}
 
-	start, _ := time.Parse(time.RFC3339, c.String("start"))
-	end, _ := time.Parse(time.RFC3339, c.String("end"))
+	now := time.Now().UTC()
+	start := now.Add(-1 * c.Duration("start"))
+	end := now.Add(-1 * c.Duration("end"))
 	step := c.Duration("step")
 
 	args := orchestrator.AnalysisArgs{
@@ -34,21 +38,12 @@ func Run(c *cli.Context) error {
 	}
 
 	log.Printf("Starting Discovery on %d variables...", len(cfg.Variables))
-	log.Printf("Window: %s -> %s (Step: %s)", start.Format(time.TimeOnly), end.Format(time.TimeOnly), step)
+	log.Printf("Window: %s -> %s (Step: %s)", start.Format(time.RFC3339), end.Format(time.RFC3339), step)
 
 	// 2. Build clients
-	// TODO: choose based on config
-	mockFetcher := mock.NewFetcher()
-
-	fetchers := map[string]map[string]fetcher.Fetcher{
-		"metrics": {
-			"mock":       mockFetcher,
-			"prometheus": mockFetcher,
-		},
-		"traces": {
-			"mock":       mockFetcher,
-			"clickhouse": mockFetcher,
-		},
+	fetchers, err := initFetchers(cfg)
+	if err != nil {
+		return err
 	}
 
 	grpcDiscoverer := grpc.NewDiscoverer()
@@ -73,6 +68,44 @@ func Run(c *cli.Context) error {
 	printGraph(graph, step)
 
 	return nil
+}
+
+func initFetchers(cfg *variable.DiscoveryConfig) (map[string]map[string]fetcher.Fetcher, error) {
+	fetchers := map[string]map[string]fetcher.Fetcher{
+		"metrics": {},
+		"traces":  {},
+	}
+
+	factories := map[string]map[string]func(string) fetcher.Fetcher{
+		"metrics": {
+			"mock":       func(_ string) fetcher.Fetcher { return mock.NewFetcher() },
+			"prometheus": func(loc string) fetcher.Fetcher { return prometheus.NewFetcher(fetcher.WithLocation(loc)) },
+		},
+		"traces": {
+			"mock":       func(_ string) fetcher.Fetcher { return mock.NewFetcher() },
+			"clickhouse": func(loc string) fetcher.Fetcher { return clickhouse.NewFetcher(fetcher.WithLocation(loc)) },
+		},
+	}
+
+	for _, v := range cfg.Variables {
+		impls, typeOk := factories[v.Source.Type]
+		if !typeOk {
+			return nil, fmt.Errorf("unsupported source type: %s", v.Source.Type)
+		}
+
+		factory, implOk := impls[v.Source.Impl]
+		if !implOk {
+			return nil, fmt.Errorf("unsupported implementation '%s' for type '%s'", v.Source.Impl, v.Source.Type)
+		}
+
+		if _, exists := fetchers[v.Source.Type][v.Source.Impl]; exists {
+			continue
+		}
+
+		fetchers[v.Source.Type][v.Source.Impl] = factory(v.Source.Loc)
+	}
+
+	return fetchers, nil
 }
 
 func printGraph(graph *causal.CausalGraph, step time.Duration) {

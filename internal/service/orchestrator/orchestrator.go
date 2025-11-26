@@ -44,6 +44,9 @@ func (s *Service) Do(
 }
 
 func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition, start time.Time, end time.Time, step time.Duration) ([]byte, error) {
+	start = start.UTC().Truncate(step).Truncate(0)
+	end = end.UTC().Truncate(step).Truncate(0)
+
 	results := make(map[string]map[time.Time]float64)
 
 	// 1. scatter
