@@ -1,4 +1,4 @@
-.PHONY: gen-proto-go gen-proto-py tidy style
+.PHONY: gen-proto-go gen-proto-py tidy style unit-test
 
 gen-proto-go:
 	@echo "Generating Go gRPC code..."
@@ -21,3 +21,7 @@ tidy:
 style:
 	@echo "Running formatter"
 	@goimports -l -w ./
+
+unit-test:
+	@echo "Running unit tests"
+	@go clean -testcache && go test -v ./...

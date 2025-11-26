@@ -11,7 +11,8 @@ import (
 )
 
 type grpcDiscoverer struct {
-	client causal.CausalDiscoveryClient
+	options discoverer.Options
+	client  causal.CausalDiscoveryClient
 }
 
 func (d *grpcDiscoverer) Discover(ctx context.Context, req *causal.DiscoverRequest) (*causal.CausalGraph, error) {
@@ -21,9 +22,12 @@ func (d *grpcDiscoverer) Discover(ctx context.Context, req *causal.DiscoverReque
 	return d.client.Discover(callCtx, req)
 }
 
-// TODO: options (addr)
-func NewDiscoverer() discoverer.Discoverer {
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+func NewDiscoverer(opts ...discoverer.Option) discoverer.Discoverer {
+	options := discoverer.NewOptions(opts...)
+
+	// TODO: validate options
+
+	conn, err := grpc.NewClient(options.Location, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
@@ -31,7 +35,8 @@ func NewDiscoverer() discoverer.Discoverer {
 	c := causal.NewCausalDiscoveryClient(conn)
 
 	d := &grpcDiscoverer{
-		client: c,
+		options: options,
+		client:  c,
 	}
 
 	return d
