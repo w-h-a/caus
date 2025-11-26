@@ -1,4 +1,4 @@
-package mock
+package random
 
 import (
 	"context"
@@ -9,10 +9,10 @@ import (
 	"github.com/w-h-a/caus/internal/client/fetcher"
 )
 
-type mockFetcher struct {
+type randomFetcher struct {
 }
 
-func (f *mockFetcher) Fetch(ctx context.Context, v variable.VariableDefinition, start time.Time, end time.Time, step time.Duration) (map[time.Time]float64, error) {
+func (f *randomFetcher) Fetch(ctx context.Context, v variable.VariableDefinition, start time.Time, end time.Time, step time.Duration) (map[time.Time]float64, error) {
 	data := make(map[time.Time]float64)
 
 	curr := start.Truncate(step)
@@ -28,7 +28,7 @@ func (f *mockFetcher) Fetch(ctx context.Context, v variable.VariableDefinition, 
 
 // TODO: options
 func NewFetcher() fetcher.Fetcher {
-	f := &mockFetcher{}
+	f := &randomFetcher{}
 
 	return f
 }

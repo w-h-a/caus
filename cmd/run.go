@@ -11,8 +11,8 @@ import (
 	"github.com/w-h-a/caus/internal/client/discoverer/grpc"
 	"github.com/w-h-a/caus/internal/client/fetcher"
 	"github.com/w-h-a/caus/internal/client/fetcher/clickhouse"
-	"github.com/w-h-a/caus/internal/client/fetcher/mock"
 	"github.com/w-h-a/caus/internal/client/fetcher/prometheus"
+	"github.com/w-h-a/caus/internal/client/fetcher/random"
 	"github.com/w-h-a/caus/internal/config"
 	"github.com/w-h-a/caus/internal/service/orchestrator"
 )
@@ -78,11 +78,11 @@ func initFetchers(cfg *variable.DiscoveryConfig) (map[string]map[string]fetcher.
 
 	factories := map[string]map[string]func(string) fetcher.Fetcher{
 		"metrics": {
-			"mock":       func(_ string) fetcher.Fetcher { return mock.NewFetcher() },
+			"random":     func(_ string) fetcher.Fetcher { return random.NewFetcher() },
 			"prometheus": func(loc string) fetcher.Fetcher { return prometheus.NewFetcher(fetcher.WithLocation(loc)) },
 		},
 		"traces": {
-			"mock":       func(_ string) fetcher.Fetcher { return mock.NewFetcher() },
+			"random":     func(_ string) fetcher.Fetcher { return random.NewFetcher() },
 			"clickhouse": func(loc string) fetcher.Fetcher { return clickhouse.NewFetcher(fetcher.WithLocation(loc)) },
 		},
 	}
