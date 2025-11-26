@@ -51,7 +51,7 @@ func main() {
 						Value: 0.05,
 					},
 				},
-				Action: cmd.Run,
+				Action: cmd.Discover,
 			},
 		},
 	}
