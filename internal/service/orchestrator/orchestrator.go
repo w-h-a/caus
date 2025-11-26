@@ -26,7 +26,7 @@ func (s *Service) Discover(
 	start time.Time,
 	end time.Time,
 	step time.Duration,
-	analysisArgs AnalysisArgs,
+	analysisArgs DiscoveryArgs,
 ) (*causal.CausalGraph, error) {
 	// 1. fetch and stitch
 	csvData, err := s.fetch(ctx, vars, start, end, step)
@@ -115,7 +115,7 @@ func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition,
 	return bs, nil
 }
 
-func (s *Service) discover(ctx context.Context, csvData []byte, analysis AnalysisArgs) (*causal.CausalGraph, error) {
+func (s *Service) discover(ctx context.Context, csvData []byte, analysis DiscoveryArgs) (*causal.CausalGraph, error) {
 	req := &causal.DiscoverRequest{
 		CsvData: string(csvData),
 		MaxLag:  analysis.MaxLag,
