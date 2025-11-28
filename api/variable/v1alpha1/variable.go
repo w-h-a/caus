@@ -33,9 +33,11 @@ type VariableDefinition struct {
 }
 
 type Source struct {
-	Type string `yaml:"type"` // e.g., "metrics", "traces"
-	Impl string `yaml:"impl"` // e.g., "prometheus", "clickhouse", "honeycomb", "datadog", etc
-	Loc  string `yaml:"loc"`
+	Type   string `yaml:"type"` // e.g., "metrics", "traces"
+	Impl   string `yaml:"impl"` // e.g., "prometheus", "clickhouse", "honeycomb", "datadog", etc
+	Loc    string `yaml:"loc"`
+	ApiKey string `yaml:"api_key"`
+	AppKey string `yaml:"app_key"`
 }
 
 type TraceQueryDetails struct {

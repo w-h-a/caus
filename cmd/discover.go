@@ -12,6 +12,7 @@ import (
 	"github.com/w-h-a/caus/internal/client/discoverer/grpc"
 	"github.com/w-h-a/caus/internal/client/fetcher"
 	"github.com/w-h-a/caus/internal/client/fetcher/clickhouse"
+	"github.com/w-h-a/caus/internal/client/fetcher/datadog"
 	"github.com/w-h-a/caus/internal/client/fetcher/prometheus"
 	"github.com/w-h-a/caus/internal/client/fetcher/random"
 	"github.com/w-h-a/caus/internal/config"
@@ -80,14 +81,20 @@ func initFetchers(cfg *variable.DiscoveryConfig) (map[string]map[string]fetcher.
 		"traces":  {},
 	}
 
-	factories := map[string]map[string]func(string) fetcher.Fetcher{
+	factories := map[string]map[string]func(loc, apiKey, appKey string) fetcher.Fetcher{
 		"metrics": {
-			"random":     func(_ string) fetcher.Fetcher { return random.NewFetcher() },
-			"prometheus": func(loc string) fetcher.Fetcher { return prometheus.NewFetcher(fetcher.WithLocation(loc)) },
+			"random":     func(_, _, _ string) fetcher.Fetcher { return random.NewFetcher() },
+			"prometheus": func(loc, _, _ string) fetcher.Fetcher { return prometheus.NewFetcher(fetcher.WithLocation(loc)) },
+			"datadog": func(loc, apiKey, appKey string) fetcher.Fetcher {
+				return datadog.NewFetcher(fetcher.WithLocation(loc), fetcher.WithApiKey(apiKey), fetcher.WithAppKey(appKey))
+			},
 		},
 		"traces": {
-			"random":     func(_ string) fetcher.Fetcher { return random.NewFetcher() },
-			"clickhouse": func(loc string) fetcher.Fetcher { return clickhouse.NewFetcher(fetcher.WithLocation(loc)) },
+			"random":     func(_, _, _ string) fetcher.Fetcher { return random.NewFetcher() },
+			"clickhouse": func(loc, _, _ string) fetcher.Fetcher { return clickhouse.NewFetcher(fetcher.WithLocation(loc)) },
+			"datadog": func(loc, apiKey, appKey string) fetcher.Fetcher {
+				return datadog.NewFetcher(fetcher.WithLocation(loc), fetcher.WithApiKey(apiKey), fetcher.WithAppKey(appKey))
+			},
 		},
 	}
 
@@ -106,7 +113,7 @@ func initFetchers(cfg *variable.DiscoveryConfig) (map[string]map[string]fetcher.
 			continue
 		}
 
-		fetchers[v.Source.Type][v.Source.Impl] = factory(v.Source.Loc)
+		fetchers[v.Source.Type][v.Source.Impl] = factory(v.Source.Loc, v.Source.ApiKey, v.Source.AppKey)
 	}
 
 	return fetchers, nil
