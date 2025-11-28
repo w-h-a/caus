@@ -1,4 +1,4 @@
-package grpc
+package v1alpha1
 
 import (
 	"context"
@@ -10,12 +10,12 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type grpcDiscoverer struct {
+type v1alpha1Discoverer struct {
 	options discoverer.Options
 	client  causal.CausalDiscoveryClient
 }
 
-func (d *grpcDiscoverer) Discover(ctx context.Context, req *causal.DiscoverRequest) (*causal.CausalGraph, error) {
+func (d *v1alpha1Discoverer) Discover(ctx context.Context, req *causal.DiscoverRequest) (*causal.CausalGraph, error) {
 	callCtx, cancel := context.WithTimeout(ctx, time.Minute*2)
 	defer cancel()
 
@@ -34,7 +34,7 @@ func NewDiscoverer(opts ...discoverer.Option) discoverer.Discoverer {
 
 	c := causal.NewCausalDiscoveryClient(conn)
 
-	d := &grpcDiscoverer{
+	d := &v1alpha1Discoverer{
 		options: options,
 		client:  c,
 	}
