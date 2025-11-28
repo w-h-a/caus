@@ -9,7 +9,7 @@ import (
 	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
 	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
 	"github.com/w-h-a/caus/internal/client/discoverer"
-	"github.com/w-h-a/caus/internal/client/discoverer/grpc"
+	"github.com/w-h-a/caus/internal/client/discoverer/v1alpha1"
 	"github.com/w-h-a/caus/internal/client/fetcher"
 	"github.com/w-h-a/caus/internal/client/fetcher/clickhouse"
 	"github.com/w-h-a/caus/internal/client/fetcher/datadog"
@@ -49,7 +49,7 @@ func Discover(c *cli.Context) error {
 	}
 
 	// TODO: pass in discoverer config and location via cli or expand variable cfg
-	grpcDiscoverer := grpc.NewDiscoverer(
+	grpcDiscoverer := v1alpha1.NewDiscoverer(
 		discoverer.WithLocation("localhost:50051"),
 	)
 
