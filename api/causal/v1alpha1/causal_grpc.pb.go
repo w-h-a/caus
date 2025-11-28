@@ -104,3 +104,89 @@ var CausalDiscovery_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "causal.proto",
 }
+
+// CausalSimulationClient is the client API for CausalSimulation service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type CausalSimulationClient interface {
+	Simulate(ctx context.Context, in *SimulateRequest, opts ...grpc.CallOption) (*SimulateResponse, error)
+}
+
+type causalSimulationClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewCausalSimulationClient(cc grpc.ClientConnInterface) CausalSimulationClient {
+	return &causalSimulationClient{cc}
+}
+
+func (c *causalSimulationClient) Simulate(ctx context.Context, in *SimulateRequest, opts ...grpc.CallOption) (*SimulateResponse, error) {
+	out := new(SimulateResponse)
+	err := c.cc.Invoke(ctx, "/causal.v1alpha1.CausalSimulation/Simulate", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// CausalSimulationServer is the server API for CausalSimulation service.
+// All implementations must embed UnimplementedCausalSimulationServer
+// for forward compatibility
+type CausalSimulationServer interface {
+	Simulate(context.Context, *SimulateRequest) (*SimulateResponse, error)
+	mustEmbedUnimplementedCausalSimulationServer()
+}
+
+// UnimplementedCausalSimulationServer must be embedded to have forward compatible implementations.
+type UnimplementedCausalSimulationServer struct {
+}
+
+func (UnimplementedCausalSimulationServer) Simulate(context.Context, *SimulateRequest) (*SimulateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Simulate not implemented")
+}
+func (UnimplementedCausalSimulationServer) mustEmbedUnimplementedCausalSimulationServer() {}
+
+// UnsafeCausalSimulationServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to CausalSimulationServer will
+// result in compilation errors.
+type UnsafeCausalSimulationServer interface {
+	mustEmbedUnimplementedCausalSimulationServer()
+}
+
+func RegisterCausalSimulationServer(s grpc.ServiceRegistrar, srv CausalSimulationServer) {
+	s.RegisterService(&CausalSimulation_ServiceDesc, srv)
+}
+
+func _CausalSimulation_Simulate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SimulateRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CausalSimulationServer).Simulate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/causal.v1alpha1.CausalSimulation/Simulate",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CausalSimulationServer).Simulate(ctx, req.(*SimulateRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// CausalSimulation_ServiceDesc is the grpc.ServiceDesc for CausalSimulation service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var CausalSimulation_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "causal.v1alpha1.CausalSimulation",
+	HandlerType: (*CausalSimulationServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Simulate",
+			Handler:    _CausalSimulation_Simulate_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "causal.proto",
+}
