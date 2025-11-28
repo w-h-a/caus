@@ -39,6 +39,7 @@ message SimulateRequest {
   string csv_data = 1;
   CausalGraph graph = 2;
   Intervention intervention = 3;
+  int32  simulation_steps = 4;
 }
 
 message Intervention {
