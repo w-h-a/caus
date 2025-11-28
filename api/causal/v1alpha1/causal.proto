@@ -8,6 +8,10 @@ service CausalDiscovery {
   rpc Discover(DiscoverRequest) returns (CausalGraph) {}
 }
 
+service CausalSimulation {
+  rpc Simulate(SimulateRequest) returns (SimulateResponse) {}
+}
+
 message DiscoverRequest {
   string csv_data = 1;
   int32 max_lag = 2;
@@ -29,4 +33,21 @@ message Edge {
   string target = 2;
   string type = 3;
   int32 lag = 4;
+}
+
+message SimulateRequest {
+  string csv_data = 1;
+  CausalGraph graph = 2;
+  Intervention intervention = 3;
+}
+
+message Intervention {
+  string target_node = 1;
+  string action = 2;
+  double value = 3;
+  int32 duration = 4;
+}
+
+message SimulateResponse {
+  string json_results = 1;
 }
