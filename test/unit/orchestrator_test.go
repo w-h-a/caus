@@ -10,14 +10,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
 	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
 	mockdiscoverer "github.com/w-h-a/caus/internal/client/discoverer/mock"
+	noopdisc "github.com/w-h-a/caus/internal/client/discoverer/noop"
 	"github.com/w-h-a/caus/internal/client/fetcher"
 	mockfetcher "github.com/w-h-a/caus/internal/client/fetcher/mock"
+	mocksimulator "github.com/w-h-a/caus/internal/client/simulator/mock"
+	noopsim "github.com/w-h-a/caus/internal/client/simulator/noop"
 	"github.com/w-h-a/caus/internal/service/orchestrator"
 )
 
-func TestOrchestrator_Stiching(t *testing.T) {
+func TestOrchestrator_Discover(t *testing.T) {
 	if len(os.Getenv("INTEGRATION")) > 0 {
 		t.Log("SKIPPING UNIT TEST")
 		return
@@ -52,11 +56,13 @@ func TestOrchestrator_Stiching(t *testing.T) {
 
 	mDiscoverer := mockdiscoverer.NewDiscoverer()
 
+	nSimulator := noopsim.NewSimulator()
+
 	fetchers := map[string]map[string]fetcher.Fetcher{
 		"metrics": {"mock": mFetcher},
 	}
 
-	svc := orchestrator.New(fetchers, mDiscoverer)
+	svc := orchestrator.New(fetchers, mDiscoverer, nSimulator)
 
 	// Act
 	vars := []variable.VariableDefinition{
@@ -68,8 +74,9 @@ func TestOrchestrator_Stiching(t *testing.T) {
 	require.NoError(t, err)
 
 	// Assert
-	assert.NotNil(t, mDiscoverer.LastRequest())
-	csvStr := mDiscoverer.LastRequest().CsvData
+	req := mDiscoverer.LastRequest()
+	assert.NotNil(t, req)
+	csvStr := req.CsvData
 	reader := csv.NewReader(strings.NewReader(csvStr))
 	rows, _ := reader.ReadAll()
 
@@ -87,6 +94,72 @@ func TestOrchestrator_Stiching(t *testing.T) {
 	assert.Equal(t, "0.0", rows[2][1])       // var_b is missing data here
 }
 
+func TestOrchestrator_Simulate(t *testing.T) {
+	if len(os.Getenv("INTEGRATION")) > 0 {
+		t.Log("SKIPPING UNIT TEST")
+		return
+	}
+
+	// Arrange
+	start := time.Date(2023, 10, 1, 10, 0, 0, 0, time.UTC) // 10:00
+	end := start.Add(2 * time.Minute)                      // 10:02
+	step := time.Minute
+
+	t0 := start
+	t1 := t0.Add(step)
+	t2 := t1.Add(step)
+
+	mockData := map[string]map[time.Time]float64{
+		"var_a": {
+			t0: 10.0,
+			t1: 11.0,
+			t2: 12.0,
+		},
+	}
+
+	mFetcher := mockfetcher.NewFetcher(
+		mockfetcher.WithData(mockData),
+	)
+
+	nDiscoverer := noopdisc.NewDiscoverer()
+
+	mSimulator := mocksimulator.NewSimulator()
+
+	fetchers := map[string]map[string]fetcher.Fetcher{
+		"metrics": {"mock": mFetcher},
+	}
+
+	svc := orchestrator.New(fetchers, nDiscoverer, mSimulator)
+
+	// Act
+	vars := []variable.VariableDefinition{
+		{Name: "var_a", Source: &variable.Source{Type: "metrics", Impl: "mock"}},
+	}
+
+	inputGraph := &causal.CausalGraph{
+		Nodes: []*causal.Node{{Id: 0, Label: "var_a"}},
+	}
+
+	intervention := &causal.Intervention{
+		TargetNode: "var_a",
+		Action:     "SET_TO_FIXED",
+		Value:      100.0,
+	}
+
+	_, err := svc.Simulate(context.Background(), vars, start, end, step, orchestrator.SimulationArgs{Graph: inputGraph, Intervention: intervention, Horizon: 60})
+	require.NoError(t, err)
+
+	// Assert
+	req := mSimulator.LastRequest()
+	assert.NotNil(t, req)
+	assert.True(t, len(req.CsvData) > 0)
+	assert.True(t, len(req.Graph.Nodes) == 1)
+	assert.Equal(t, "var_a", req.Graph.Nodes[0].Label)
+	assert.Equal(t, "var_a", req.Intervention.TargetNode)
+	assert.Equal(t, 100.0, req.Intervention.Value)
+	assert.Equal(t, int32(60), req.SimulationSteps)
+}
+
 func TestOrchestrator_FetchAlignment(t *testing.T) {
 	if len(os.Getenv("INTEGRATION")) > 0 {
 		t.Log("SKIPPING UNIT TEST")
@@ -102,11 +175,13 @@ func TestOrchestrator_FetchAlignment(t *testing.T) {
 
 	mDiscoverer := mockdiscoverer.NewDiscoverer()
 
+	nSimulator := noopsim.NewSimulator()
+
 	fetchers := map[string]map[string]fetcher.Fetcher{
 		"metrics": {"mock": mFetcher},
 	}
 
-	svc := orchestrator.New(fetchers, mDiscoverer)
+	svc := orchestrator.New(fetchers, mDiscoverer, nSimulator)
 
 	// Act
 	vars := []variable.VariableDefinition{

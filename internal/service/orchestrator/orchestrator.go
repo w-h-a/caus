@@ -13,11 +13,13 @@ import (
 	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
 	"github.com/w-h-a/caus/internal/client/discoverer"
 	"github.com/w-h-a/caus/internal/client/fetcher"
+	"github.com/w-h-a/caus/internal/client/simulator"
 )
 
 type Service struct {
 	fetchers   map[string]map[string]fetcher.Fetcher
 	discoverer discoverer.Discoverer
+	simulator  simulator.Simulator
 }
 
 func (s *Service) Discover(
@@ -26,7 +28,7 @@ func (s *Service) Discover(
 	start time.Time,
 	end time.Time,
 	step time.Duration,
-	analysisArgs DiscoveryArgs,
+	discoveryArgs DiscoveryArgs,
 ) (*causal.CausalGraph, error) {
 	// 1. fetch and stitch
 	csvData, err := s.fetch(ctx, vars, start, end, step)
@@ -35,12 +37,35 @@ func (s *Service) Discover(
 	}
 
 	// 2. discover direct causes
-	graph, err := s.discover(ctx, csvData, analysisArgs)
+	graph, err := s.discover(ctx, csvData, discoveryArgs)
 	if err != nil {
 		return nil, err
 	}
 
 	return graph, nil
+}
+
+func (s *Service) Simulate(
+	ctx context.Context,
+	vars []variable.VariableDefinition,
+	start time.Time,
+	end time.Time,
+	step time.Duration,
+	simulationArgs SimulationArgs,
+) (string, error) {
+	// 1. fetch and stitch
+	csvData, err := s.fetch(ctx, vars, start, end, step)
+	if err != nil {
+		return "", err
+	}
+
+	// 2. do counterfactual prediction
+	result, err := s.simulate(ctx, csvData, simulationArgs)
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
 }
 
 func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition, start time.Time, end time.Time, step time.Duration) ([]byte, error) {
@@ -115,11 +140,11 @@ func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition,
 	return bs, nil
 }
 
-func (s *Service) discover(ctx context.Context, csvData []byte, analysis DiscoveryArgs) (*causal.CausalGraph, error) {
+func (s *Service) discover(ctx context.Context, csvData []byte, discovery DiscoveryArgs) (*causal.CausalGraph, error) {
 	req := &causal.DiscoverRequest{
 		CsvData: string(csvData),
-		MaxLag:  analysis.MaxLag,
-		PcAlpha: analysis.PcAlpha,
+		MaxLag:  discovery.MaxLag,
+		PcAlpha: discovery.PcAlpha,
 	}
 
 	graph, err := s.discoverer.Discover(ctx, req)
@@ -130,9 +155,26 @@ func (s *Service) discover(ctx context.Context, csvData []byte, analysis Discove
 	return graph, nil
 }
 
-func New(fs map[string]map[string]fetcher.Fetcher, d discoverer.Discoverer) *Service {
+func (s *Service) simulate(ctx context.Context, csvData []byte, simulation SimulationArgs) (string, error) {
+	req := &causal.SimulateRequest{
+		CsvData:         string(csvData),
+		Graph:           simulation.Graph,
+		Intervention:    simulation.Intervention,
+		SimulationSteps: simulation.Horizon,
+	}
+
+	rsp, err := s.simulator.Simulate(ctx, req)
+	if err != nil {
+		return "", fmt.Errorf("failed to perform counterfactual simulation: %w", err)
+	}
+
+	return rsp.JsonResults, nil
+}
+
+func New(fs map[string]map[string]fetcher.Fetcher, d discoverer.Discoverer, s simulator.Simulator) *Service {
 	return &Service{
 		fetchers:   fs,
 		discoverer: d,
+		simulator:  s,
 	}
 }

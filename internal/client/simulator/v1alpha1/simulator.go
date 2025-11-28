@@ -15,11 +15,11 @@ type v1alpha1Simulator struct {
 	client  causal.CausalSimulationClient
 }
 
-func (d *v1alpha1Simulator) Simulate(ctx context.Context, req *causal.SimulateRequest) (*causal.SimulateResponse, error) {
+func (s *v1alpha1Simulator) Simulate(ctx context.Context, req *causal.SimulateRequest) (*causal.SimulateResponse, error) {
 	callCtx, cancel := context.WithTimeout(ctx, time.Minute*2)
 	defer cancel()
 
-	return d.client.Simulate(callCtx, req)
+	return s.client.Simulate(callCtx, req)
 }
 
 func NewDiscoverer(opts ...simulator.Option) simulator.Simulator {

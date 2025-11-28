@@ -15,6 +15,7 @@ import (
 	"github.com/w-h-a/caus/internal/client/fetcher/datadog"
 	"github.com/w-h-a/caus/internal/client/fetcher/prometheus"
 	"github.com/w-h-a/caus/internal/client/fetcher/random"
+	"github.com/w-h-a/caus/internal/client/simulator/noop"
 	"github.com/w-h-a/caus/internal/config"
 	"github.com/w-h-a/caus/internal/service/orchestrator"
 )
@@ -49,12 +50,14 @@ func Discover(c *cli.Context) error {
 	}
 
 	// TODO: pass in discoverer config and location via cli or expand variable cfg
-	grpcDiscoverer := v1alpha1.NewDiscoverer(
+	v1alpha1Discoverer := v1alpha1.NewDiscoverer(
 		discoverer.WithLocation("localhost:50051"),
 	)
 
+	noopSimulator := noop.NewSimulator()
+
 	// 3. Build services
-	o := orchestrator.New(fetchers, grpcDiscoverer)
+	o := orchestrator.New(fetchers, v1alpha1Discoverer, noopSimulator)
 
 	// 4. Run Discover
 	graph, err := o.Discover(
