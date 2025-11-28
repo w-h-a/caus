@@ -41,7 +41,8 @@ caus simulate \
   --end="0" \
   --step="1m" \
   --do="service_a_calls * 1.2" \
-  --target="service_b_cpu"
+  --target="service_b_cpu" \
+  --horizon="60"
 ```
 The output is a quantitative answer to your counterfactual question.
 
@@ -50,7 +51,7 @@ The output is a quantitative answer to your counterfactual question.
 * The Go gRPC Client (Orchestrator): It takes a request with a list of your aggregated trace and metrics data and a past time window. It queries for metrics and for aggregated trace data and fires off requests to perform discovery or simulations to the Python gRPC Server.
 * The Python gRPC Server (Worker): It receives the data and query and performs the heavy lifting:
   * For Discovery, it runs the PCMCI time-series causal discovery algorithm
-  * For Simulation, it fits a causal model and uses Pearl's do-calculus to make counterfactual predictions.
+  * For Simulation, it fits a linear causal model based on the discovered graph and data to make counterfactual predictions.
 
 ## The Data: Map vs Street
 
