@@ -6,12 +6,26 @@ type Option func(*Options)
 
 type Options struct {
 	Location string
+	ApiKey   string
+	AppKey   string
 	Context  context.Context
 }
 
 func WithLocation(loc string) Option {
 	return func(o *Options) {
 		o.Location = loc
+	}
+}
+
+func WithApiKey(key string) Option {
+	return func(o *Options) {
+		o.ApiKey = key
+	}
+}
+
+func WithAppKey(key string) Option {
+	return func(o *Options) {
+		o.AppKey = key
 	}
 }
 
