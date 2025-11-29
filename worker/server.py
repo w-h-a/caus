@@ -111,19 +111,16 @@ def perform_simulation(csv_data: str, graph_proto: pb.CausalGraph, intervention:
             
             model = LinearRegression()
             model.fit(X, y)
+            logging.info(f"Model for {node}: Coeffs={model.coef_} Intercept={model.intercept_} Features={feature_names}")
             models[node] = { "model": model, "parents": valid_parents, "features": feature_names }
 
         # 4. Run Simulation
         if sim_steps <= 0:
             sim_steps = 60
 
-        logging.info(sim_steps)
-
         # Ensure we don't go out of bounds
         if len(df) < sim_steps + max_lag_in_graph:
             sim_steps = len(df) - max_lag_in_graph
-
-        logging.info(sim_steps)
 
         start_t = len(df) - sim_steps
         sim_df = df.copy()

@@ -69,8 +69,12 @@ func Discover(c *cli.Context) error {
 
 	// 5. Print graph (json or pretty)
 	if c.Bool("json") {
-		m := protojson.MarshalOptions{Multiline: true}
-		bs, _ := m.Marshal(graph)
+		opts := protojson.MarshalOptions{
+			Multiline:       true,
+			Indent:          "  ",
+			EmitUnpopulated: true,
+		}
+		bs, _ := opts.Marshal(graph)
 		fmt.Println(string(bs))
 	} else {
 		printGraph(graph, step)

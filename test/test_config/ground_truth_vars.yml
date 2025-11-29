@@ -1,0 +1,18 @@
+variables:
+  - name: "service_a"
+    source:
+      type: "metrics"
+      impl: "csv"
+      loc: "./test/test_data/ground_truth.csv" 
+
+  - name: "service_b"
+    source:
+      type: "metrics"
+      impl: "csv"
+      loc: "./test/test_data/ground_truth.csv"
+
+  - name: "service_c"
+    source:
+      type: "metrics"
+      impl: "csv"
+      loc: "./test/test_data/ground_truth.csv"
