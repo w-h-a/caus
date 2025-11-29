@@ -50,6 +50,11 @@ func main() {
 						Usage: "Significance level (e.g., 0.05)",
 						Value: 0.05,
 					},
+					&cli.BoolFlag{
+						Name: "json",
+						Usage: "Print the resulting graph to stdout as json",
+						Value: false,
+					},
 				},
 				Action: cmd.Discover,
 			},
