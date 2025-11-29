@@ -22,7 +22,7 @@ func (s *v1alpha1Simulator) Simulate(ctx context.Context, req *causal.SimulateRe
 	return s.client.Simulate(callCtx, req)
 }
 
-func NewDiscoverer(opts ...simulator.Option) simulator.Simulator {
+func NewSimulator(opts ...simulator.Option) simulator.Simulator {
 	options := simulator.NewOptions(opts...)
 
 	// TODO: validate options

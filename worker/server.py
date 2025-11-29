@@ -62,7 +62,7 @@ def perform_causal_discovery(csv_data_string: str, max_lag: int, pc_alpha: float
         logging.error(f"Causal discovery failed: {e}")
         raise
 
-def perform_simulation(csv_data: str, graph_proto: pb.CausalGraph, intervention: pb.Intervention) -> str:
+def perform_simulation(csv_data: str, graph_proto: pb.CausalGraph, intervention: pb.Intervention, sim_steps: int) -> str:
     """
     Fits SCM and runs counterfactual simulation.
     """
@@ -89,17 +89,20 @@ def perform_simulation(csv_data: str, graph_proto: pb.CausalGraph, intervention:
 
             X_features = []
             valid_parents = []
+            feature_names = []
             
             for p_name, p_lag in node_parents:
                 if p_lag > 0:
                     max_lag_in_graph = max(max_lag_in_graph, p_lag)
                     X_features.append(df[p_name].shift(p_lag))
                     valid_parents.append((p_name, p_lag))
+                    feature_names.append(f"{p_name}_lag{p_lag}")
             
             if not X_features:
                 continue
 
             X = pd.concat(X_features, axis=1)
+            X.columns = feature_names
             y = df[node]
             
             valid_idx = X.dropna().index
@@ -108,16 +111,19 @@ def perform_simulation(csv_data: str, graph_proto: pb.CausalGraph, intervention:
             
             model = LinearRegression()
             model.fit(X, y)
-            models[node] = { "model": model, "parents": valid_parents }
+            models[node] = { "model": model, "parents": valid_parents, "features": feature_names }
 
         # 4. Run Simulation
-        sim_steps = request.simulation_steps
         if sim_steps <= 0:
             sim_steps = 60
+
+        logging.info(sim_steps)
 
         # Ensure we don't go out of bounds
         if len(df) < sim_steps + max_lag_in_graph:
             sim_steps = len(df) - max_lag_in_graph
+
+        logging.info(sim_steps)
 
         start_t = len(df) - sim_steps
         sim_df = df.copy()
@@ -143,13 +149,16 @@ def perform_simulation(csv_data: str, graph_proto: pb.CausalGraph, intervention:
                     model_info = models[node]
                     sk_model = model_info["model"]
                     node_parents = model_info["parents"]
+                    feature_names = model_info["features"]
                     
-                    features = []
-                    for p_name, p_lag in node_parents:
+                    input_data = {}
+                    for (p_name, p_lag), feat_name in zip(node_parents, feature_names):
                         val = sim_df.at[t - p_lag, p_name]
-                        features.append(val)
+                        input_data[feat_name] = [val]
                     
-                    pred = sk_model.predict([features])[0]
+                    # Create single-row DataFrame so sklearn sees the column names
+                    X_pred = pd.DataFrame(input_data)
+                    pred = sk_model.predict(X_pred)[0]
                     sim_df.at[t, node] = pred
 
         # 5. Format Results
@@ -187,11 +196,12 @@ class CausalDiscoveryServicer(causal_pb2_grpc.CausalDiscoveryServicer):
 class CausalSimulationServicer(causal_pb2_grpc.CausalSimulationServicer):
     def Simulate(self, request: pb.SimulateRequest, context):
         try:
-            logging.info(f"Received Simulation request for target: {request.intervention.target_node}")
+            logging.info(f"Received Simulation request for intervention on: {request.intervention.target_node}")
             json_res = perform_simulation(
                 request.csv_data, 
                 request.graph, 
-                request.intervention
+                request.intervention,
+                request.simulation_steps
             )
             logging.info("Simulation complete.")
             return pb.SimulateResponse(json_results=json_res)
