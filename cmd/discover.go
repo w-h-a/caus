@@ -18,6 +18,7 @@ import (
 	"github.com/w-h-a/caus/internal/client/simulator/noop"
 	"github.com/w-h-a/caus/internal/config"
 	"github.com/w-h-a/caus/internal/service/orchestrator"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 func Discover(c *cli.Context) error {
@@ -72,8 +73,14 @@ func Discover(c *cli.Context) error {
 		return err
 	}
 
-	// 5. Print the graph
-	printGraph(graph, step)
+	// 5. Print graph (json or pretty)
+	if c.Bool("json") {
+		m := protojson.MarshalOptions{Multiline: true}
+		bs, _ := m.Marshal(graph)
+		fmt.Println(string(bs))
+	} else {
+		printGraph(graph, step)
+	}
 
 	return nil
 }
