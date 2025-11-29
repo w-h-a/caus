@@ -1,29 +1,48 @@
 {
-  "nodes": [
+  "nodes":  [
     {
-      "label": "front_latency"
+      "id":  0,
+      "label":  "service_a"
     },
     {
-      "id": 1,
-      "label": "front_calls"
+      "id":  1,
+      "label":  "service_b"
     },
     {
-      "id": 2,
-      "label": "orders_cpu"
+      "id":  2,
+      "label":  "service_c"
     }
   ],
-  "edges": [
+  "edges":  [
     {
-      "source": "front_calls",
-      "target": "front_latency",
-      "type": "directed",
-      "lag": 1
+      "source":  "service_a",
+      "target":  "service_a",
+      "type":  "directed",
+      "lag":  1
     },
     {
-      "source": "front_calls",
-      "target": "orders_cpu",
-      "type": "directed",
-      "lag": 1
+      "source":  "service_a",
+      "target":  "service_b",
+      "type":  "directed",
+      "lag":  1
+    },
+    {
+      "source":  "service_b",
+      "target":  "service_b",
+      "type":  "directed",
+      "lag":  1
+    },
+    {
+      "source":  "service_b",
+      "target":  "service_c",
+      "type":  "directed",
+      "lag":  2
+    },
+    {
+      "source":  "service_c",
+      "target":  "service_c",
+      "type":  "directed",
+      "lag":  1
     }
   ]
 }
