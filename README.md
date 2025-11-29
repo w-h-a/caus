@@ -36,12 +36,12 @@ The `caus` CLI:
 ```bash
 caus simulate \
   --graph="/path/to/graph.json" \
+  --do="service_a_calls * 1.2" \
   --vars="/path/to/vars.yml" \
   --start="2h" \
   --end="0" \
-  --step="1m" \
-  --do="service_a_calls * 1.2" \
-  --target="service_b_cpu" \
+  --step="1m" \  
+  --effect="service_b_cpu" \
   --horizon="60"
 ```
 The output is a quantitative answer to your counterfactual question.
