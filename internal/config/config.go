@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
@@ -18,7 +19,9 @@ func LoadConfig(path string) (*variable.DiscoveryConfig, error) {
 		return nil, err
 	}
 
-	// TODO: add validation
+	if err := cfg.Validate(); err != nil {
+		return nil, fmt.Errorf("config validation failed: %w", err)
+	}
 
 	return &cfg, nil
 }
