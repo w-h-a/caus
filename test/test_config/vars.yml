@@ -2,7 +2,7 @@ variables:
   - name: "front_latency"
     source: 
       type: "traces"
-      impl: "random"
+      impl: "clickhouse"
       loc: "tcp://localhost:9000"
     trace_query:
       service: "front"
@@ -12,7 +12,7 @@ variables:
   - name: "front_calls"
     source:
       type: "traces"
-      impl: "random"
+      impl: "clickhouse"
       loc: "tcp://localhost:9000"
     trace_query:
       service: "front"
@@ -22,6 +22,6 @@ variables:
   - name: "orders_cpu"
     source:
       type: "metrics"
-      impl: "random"
+      impl: "prometheus"
       loc: "http://localhost:9090"
     metrics_query: "container_cpu_utilization_ratio{container_name='orders'}"

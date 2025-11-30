@@ -25,10 +25,10 @@ func Discover(c *cli.Context) error {
 		return fmt.Errorf("loading config: %w", err)
 	}
 
-	now := time.Now().UTC()
+	step := c.Duration("step")
+	now := time.Now().UTC().Truncate(step)
 	start := now.Add(-1 * c.Duration("start"))
 	end := now.Add(-1 * c.Duration("end"))
-	step := c.Duration("step")
 
 	args := orchestrator.DiscoveryArgs{
 		MaxLag:  int32(c.Int("lag")),

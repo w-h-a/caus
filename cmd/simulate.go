@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math"
 	"os"
 	"regexp"
@@ -44,16 +45,19 @@ func Simulate(c *cli.Context) error {
 		return err
 	}
 
-	now := time.Now().UTC()
+	step := c.Duration("step")
+	now := time.Now().UTC().Truncate(step)
 	start := now.Add(-1 * c.Duration("start"))
 	end := now.Add(-1 * c.Duration("end"))
-	step := c.Duration("step")
 
 	args := orchestrator.SimulationArgs{
 		Graph:        &graph,
 		Intervention: intervention,
 		Horizon:      int32(c.Int("horizon")),
 	}
+
+	log.Printf("Starting Simulation on %d variables...", len(cfg.Variables))
+	log.Printf("Window: %s -> %s (Step: %s)", start.Format(time.RFC3339), end.Format(time.RFC3339), step)
 
 	// 2. Build clients
 	fetchers, err := initFetchers(cfg)

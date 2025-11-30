@@ -33,7 +33,7 @@ func main() {
 						Name:    "end",
 						Aliases: []string{"e"},
 						Usage:   "How long ago to end (e.g., '0m' for now)",
-						Value:   0,
+						Value:   5 * time.Minute,
 					},
 					&cli.DurationFlag{
 						Name:  "step",
@@ -89,7 +89,7 @@ func main() {
 						Name:    "end",
 						Aliases: []string{"e"},
 						Usage:   "How long ago to end (e.g., '0m' for now)",
-						Value:   0,
+						Value:   5 * time.Minute,
 					},
 					&cli.DurationFlag{
 						Name:  "step",
