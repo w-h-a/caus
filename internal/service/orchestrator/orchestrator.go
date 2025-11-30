@@ -127,7 +127,13 @@ func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition,
 		for i, v := range vars {
 			val, ok := results[v.Name][current]
 			if !ok {
-				row[i] = lastKnown[i]
+				zeroOK := v.Source.Type == "traces" && v.TraceQuery != nil && v.TraceQuery.Dimension == "calls"
+				if zeroOK {
+					row[i] = "0.0"
+					lastKnown[i] = "0.0"
+				} else {
+					row[i] = lastKnown[i]
+				}
 			} else {
 				val := strconv.FormatFloat(val, 'f', 6, 64)
 				row[i] = val
