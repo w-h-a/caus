@@ -83,7 +83,7 @@ func TestOrchestrator_Discover(t *testing.T) {
 	/* Expected CSV Structure:
 	header: var_a, var_b
 	row 1:  10.0,  20.0
-	row 2:  11.0,  0.0   <-- var_b filled with 0.0
+	row 2:  11.0,  20.0   <-- var_b filled with last known since it's metrics
 	row 3:  12.0,  22.0
 	*/
 
