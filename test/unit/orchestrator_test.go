@@ -91,7 +91,7 @@ func TestOrchestrator_Discover(t *testing.T) {
 	assert.Equal(t, "var_a", rows[0][0])
 	assert.Equal(t, "var_b", rows[0][1])
 	assert.Equal(t, "11.000000", rows[2][0]) // var_a should have data
-	assert.Equal(t, "0.0", rows[2][1])       // var_b is missing data here
+	assert.Equal(t, "20.000000", rows[2][1]) // var_b is missing data here so should be filled with last known
 	assert.Equal(t, int32(1), req.MaxLag)
 	assert.Equal(t, float32(0.05), req.PcAlpha)
 }

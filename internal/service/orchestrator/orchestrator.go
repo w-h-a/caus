@@ -111,6 +111,12 @@ func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition,
 		return nil, err
 	}
 
+	// keep track of the last known for each column
+	lastKnown := make([]string, len(vars))
+	for i := range lastKnown {
+		lastKnown[i] = "0.0"
+	}
+
 	// iterate over steps
 	current := start.Truncate(step)
 	endTime := end.Truncate(step)
@@ -121,10 +127,11 @@ func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition,
 		for i, v := range vars {
 			val, ok := results[v.Name][current]
 			if !ok {
-				// TODO: Handle missing data
-				row[i] = "0.0"
+				row[i] = lastKnown[i]
 			} else {
-				row[i] = strconv.FormatFloat(val, 'f', 6, 64)
+				val := strconv.FormatFloat(val, 'f', 6, 64)
+				row[i] = val
+				lastKnown[i] = val
 			}
 		}
 		if err := writer.Write(row); err != nil {
