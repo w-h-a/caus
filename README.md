@@ -10,7 +10,7 @@ All of these sound reasonable. You apply a fix, deploy it, and hope. If it works
 
 `caus` is a counterfactual prediction engine.
 
-It allows you to test your engineering intuition using historical data. You provide the hypothesis (a causal graph) and variable configuration, and `caus` tells you what *would have happened* if you had intervened on the causes of the effects you care about. It turns your Post-Mortem action items from "Let's try optimizing this SQL query" into "Reducing outbound calls would have reduced latency by 42%".
+It allows you to test your engineering intuition using historical data. You provide the hypothesis (a causal graph) and variable configuration, and `caus` tells you what *would have happened* if you had intervened on the causes of the effects you care about. It turns your Post-Mortem action items from "Let's try optimizing this SQL query" into "Reducing outbound call duration would have reduced latency by 42%".
 
 **The Question:**
 My theory is that the `orders` service is saturating the Redis CPU, slowing down the `payments` service. If we had rate-limited `orders` by 50%, by how much would `payments` latency decrease?
