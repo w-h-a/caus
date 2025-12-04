@@ -47,7 +47,7 @@ func (f *clickhouseFetcher) Fetch(ctx context.Context, v variable.VariableDefini
 				return nil, fmt.Errorf("failed to parse time string '%s': %w", r.Time, err)
 			}
 		}
-		data[t.UTC().Truncate(0)] = r.Value
+		data[t.UTC().Truncate(step)] = r.Value
 	}
 
 	return data, nil

@@ -46,7 +46,7 @@ func (f *prometheusFetcher) Fetch(ctx context.Context, v variable.VariableDefini
 
 	for _, pair := range stream.Values {
 		t := pair.Timestamp.Time()
-		result[t.UTC().Truncate(0)] = float64(pair.Value)
+		result[t.UTC().Truncate(step)] = float64(pair.Value)
 	}
 
 	return result, nil
