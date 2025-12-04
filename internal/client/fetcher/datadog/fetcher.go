@@ -27,7 +27,7 @@ func (f *datadogFetcher) Fetch(ctx context.Context, v variable.VariableDefinitio
 	if v.Source.Type == "traces" {
 		query = fmt.Sprintf("%s:trace.%s.%s.rollup(%s, %d)", v.TraceQuery.AggregationOption, v.TraceQuery.ServiceName, v.TraceQuery.Dimension, v.TraceQuery.AggregationOption, interval)
 	} else {
-		query = fmt.Sprintf("(%s).rollup(avg, %d)", v.MetricsQuery, interval)
+		query = fmt.Sprintf("%s.rollup(avg, %d)", v.MetricsQuery, interval)
 	}
 
 	rsp, _, err := f.client.QueryMetrics(f.withContext(ctx), start.Unix(), end.Unix(), query)
@@ -48,8 +48,9 @@ func (f *datadogFetcher) Fetch(ctx context.Context, v variable.VariableDefinitio
 		if len(point) < 2 || point[0] == nil || point[1] == nil {
 			continue
 		}
-		t := time.Unix(int64(*point[0]), 0)
-		result[t.UTC().Truncate(0)] = *point[1]
+		tsSeconds := int64(*point[0]) / 1000
+		t := time.Unix(tsSeconds, 0)
+		result[t.UTC().Truncate(step)] = *point[1]
 	}
 
 	return result, nil
@@ -60,8 +61,8 @@ func (f *datadogFetcher) withContext(ctx context.Context) context.Context {
 		ctx,
 		datadog.ContextAPIKeys,
 		map[string]datadog.APIKey{
-			"apiKey": {Key: f.options.ApiKey},
-			"appKey": {Key: f.options.AppKey},
+			"apiKeyAuth": {Key: f.options.ApiKey},
+			"appKeyAuth": {Key: f.options.AppKey},
 		},
 	)
 

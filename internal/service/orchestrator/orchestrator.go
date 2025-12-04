@@ -150,6 +150,8 @@ func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition,
 	writer.Flush()
 	bs := buf.Bytes()
 
+	log.Println(string(bs))
+
 	return bs, nil
 }
 
