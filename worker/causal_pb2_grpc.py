@@ -97,7 +97,7 @@ class CausalDiscovery(object):
             _registered_method=True)
 
 
-class CausalSimulationStub(object):
+class CausalEstimationStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -106,43 +106,43 @@ class CausalSimulationStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.Simulate = channel.unary_unary(
-                '/causal.v1alpha1.CausalSimulation/Simulate',
-                request_serializer=causal__pb2.SimulateRequest.SerializeToString,
-                response_deserializer=causal__pb2.SimulateResponse.FromString,
+        self.Estimate = channel.unary_unary(
+                '/causal.v1alpha1.CausalEstimation/Estimate',
+                request_serializer=causal__pb2.EstimateRequest.SerializeToString,
+                response_deserializer=causal__pb2.EstimateResponse.FromString,
                 _registered_method=True)
 
 
-class CausalSimulationServicer(object):
+class CausalEstimationServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def Simulate(self, request, context):
+    def Estimate(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_CausalSimulationServicer_to_server(servicer, server):
+def add_CausalEstimationServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'Simulate': grpc.unary_unary_rpc_method_handler(
-                    servicer.Simulate,
-                    request_deserializer=causal__pb2.SimulateRequest.FromString,
-                    response_serializer=causal__pb2.SimulateResponse.SerializeToString,
+            'Estimate': grpc.unary_unary_rpc_method_handler(
+                    servicer.Estimate,
+                    request_deserializer=causal__pb2.EstimateRequest.FromString,
+                    response_serializer=causal__pb2.EstimateResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'causal.v1alpha1.CausalSimulation', rpc_method_handlers)
+            'causal.v1alpha1.CausalEstimation', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('causal.v1alpha1.CausalSimulation', rpc_method_handlers)
+    server.add_registered_method_handlers('causal.v1alpha1.CausalEstimation', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class CausalSimulation(object):
+class CausalEstimation(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def Simulate(request,
+    def Estimate(request,
             target,
             options=(),
             channel_credentials=None,
@@ -155,9 +155,9 @@ class CausalSimulation(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/causal.v1alpha1.CausalSimulation/Simulate',
-            causal__pb2.SimulateRequest.SerializeToString,
-            causal__pb2.SimulateResponse.FromString,
+            '/causal.v1alpha1.CausalEstimation/Estimate',
+            causal__pb2.EstimateRequest.SerializeToString,
+            causal__pb2.EstimateResponse.FromString,
             options,
             channel_credentials,
             insecure,

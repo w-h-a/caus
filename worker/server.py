@@ -62,9 +62,9 @@ def perform_causal_discovery(csv_data_string: str, max_lag: int, pc_alpha: float
         logging.error(f"Causal discovery failed: {e}")
         raise
 
-def perform_simulation(csv_data: str, graph_proto: pb.CausalGraph, intervention: pb.Intervention, sim_steps: int) -> str:
+def perform_estimation(csv_data: str, graph_proto: pb.CausalGraph) -> dict[str, pb.ModelInfo]:
     """
-    Fits SCM and runs counterfactual simulation.
+    Fits SCM.
     """
     try:
         # 1. Load Data
@@ -80,7 +80,6 @@ def perform_simulation(csv_data: str, graph_proto: pb.CausalGraph, intervention:
 
         # 3. Fit SCM
         models = {}
-        max_lag_in_graph = 0
         
         for node in df.columns:
             node_parents = parents[node]
@@ -88,14 +87,11 @@ def perform_simulation(csv_data: str, graph_proto: pb.CausalGraph, intervention:
                 continue 
 
             X_features = []
-            valid_parents = []
             feature_names = []
             
             for p_name, p_lag in node_parents:
-                if p_lag > 0:
-                    max_lag_in_graph = max(max_lag_in_graph, p_lag)
+                if p_lag >= 0:
                     X_features.append(df[p_name].shift(p_lag))
-                    valid_parents.append((p_name, p_lag))
                     feature_names.append(f"{p_name}_lag{p_lag}")
             
             if not X_features:
@@ -111,65 +107,23 @@ def perform_simulation(csv_data: str, graph_proto: pb.CausalGraph, intervention:
             
             model = LinearRegression()
             model.fit(X, y)
+
             logging.info(f"Model for {node}: Coeffs={model.coef_} Intercept={model.intercept_} Features={feature_names}")
-            models[node] = { "model": model, "parents": valid_parents, "features": feature_names }
+            models[node] = { "model": model, "features": feature_names }
 
-        # 4. Run Simulation
-        if sim_steps <= 0:
-            sim_steps = 60
+        # 4. Format Results
+        pb_models = {}
+        for node, info in models.items():
+            pb_models[node] = pb.ModelInfo(
+                features=info["features"],
+                coefficients=info["model"].coef_.tolist(),
+                intercept=float(info["model"].intercept_)
+            )
 
-        # Ensure we don't go out of bounds
-        if len(df) < sim_steps + max_lag_in_graph:
-            sim_steps = len(df) - max_lag_in_graph
-
-        start_t = len(df) - sim_steps
-        sim_df = df.copy()
-
-        for t in range(start_t, len(df)):
-            for node in df.columns:
-                
-                # A. Apply Intervention
-                if node == intervention.target_node:
-                    original_val = sim_df.at[t, node]
-                    new_val = original_val
-                    
-                    if intervention.action == "INCREASE_BY_PERCENT":
-                        new_val = original_val * (1.0 + intervention.value)
-                    elif intervention.action == "SET_TO_FIXED":
-                        new_val = intervention.value
-                    
-                    sim_df.at[t, node] = new_val
-                    continue 
-
-                # B. Predict using SCM
-                if node in models:
-                    model_info = models[node]
-                    sk_model = model_info["model"]
-                    node_parents = model_info["parents"]
-                    feature_names = model_info["features"]
-                    
-                    input_data = {}
-                    for (p_name, p_lag), feat_name in zip(node_parents, feature_names):
-                        val = sim_df.at[t - p_lag, p_name]
-                        input_data[feat_name] = [val]
-                    
-                    # Create single-row DataFrame so sklearn sees the column names
-                    X_pred = pd.DataFrame(input_data)
-                    pred = sk_model.predict(X_pred)[0]
-                    sim_df.at[t, node] = pred
-
-        # 5. Format Results
-        result = { "metrics": {} }
-        for col in df.columns:
-            result["metrics"][col] = {
-                "original": df[col].iloc[start_t:].tolist(),
-                "simulated": sim_df[col].iloc[start_t:].tolist()
-            }
-
-        return json.dumps(result)
+        return pb_models
 
     except Exception as e:
-        logging.error(f"Simulation failed: {e}")
+        logging.error(f"Estimation failed: {e}")
         raise
 
 class CausalDiscoveryServicer(causal_pb2_grpc.CausalDiscoveryServicer):
@@ -190,23 +144,21 @@ class CausalDiscoveryServicer(causal_pb2_grpc.CausalDiscoveryServicer):
             context.set_details(f"Python error: {e}")
             return pb.CausalGraph()
 
-class CausalSimulationServicer(causal_pb2_grpc.CausalSimulationServicer):
-    def Simulate(self, request: pb.SimulateRequest, context):
+class CausalEstimationServicer(causal_pb2_grpc.CausalEstimationServicer):
+    def Estimate(self, request: pb.EstimateRequest, context):
         try:
-            logging.info(f"Received Simulation request for intervention on: {request.intervention.target_node}")
-            json_res = perform_simulation(
+            logging.info(f"Received Estimation request.")
+            models_map = perform_estimation(
                 request.csv_data, 
                 request.graph, 
-                request.intervention,
-                request.simulation_steps
             )
-            logging.info("Simulation complete.")
-            return pb.SimulateResponse(json_results=json_res)
+            logging.info("Estimation complete.")
+            return pb.EstimateResponse(models=models_map)
         except Exception as e:
-            logging.error(f"Error in Simulate: {e}")
+            logging.error(f"Error in Estimate: {e}")
             context.set_code(grpc.StatusCode.INTERNAL)
             context.set_details(f"Python error: {e}")
-            return pb.SimulateResponse()
+            return pb.EstimateResponse()
 
 def serve():
     """Starts the gRPC server and waits for connections."""
@@ -215,8 +167,8 @@ def serve():
     causal_pb2_grpc.add_CausalDiscoveryServicer_to_server(
         CausalDiscoveryServicer(), server
     )
-    causal_pb2_grpc.add_CausalSimulationServicer_to_server(
-        CausalSimulationServicer(), server
+    causal_pb2_grpc.add_CausalEstimationServicer_to_server(
+        CausalEstimationServicer(), server
     )
 
     port = "50051"

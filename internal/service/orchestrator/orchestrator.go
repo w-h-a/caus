@@ -12,14 +12,14 @@ import (
 	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
 	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
 	"github.com/w-h-a/caus/internal/client/discoverer"
+	"github.com/w-h-a/caus/internal/client/estimator"
 	"github.com/w-h-a/caus/internal/client/fetcher"
-	"github.com/w-h-a/caus/internal/client/simulator"
 )
 
 type Service struct {
 	fetchers   map[string]map[string]fetcher.Fetcher
 	discoverer discoverer.Discoverer
-	simulator  simulator.Simulator
+	estimator  estimator.Estimator
 }
 
 func (s *Service) Discover(
@@ -45,24 +45,24 @@ func (s *Service) Discover(
 	return graph, nil
 }
 
-func (s *Service) Simulate(
+func (s *Service) Estimate(
 	ctx context.Context,
 	vars []variable.VariableDefinition,
 	start time.Time,
 	end time.Time,
 	step time.Duration,
-	simulationArgs SimulationArgs,
-) (string, error) {
+	estimateArgs EstimateArgs,
+) (*causal.EstimateResponse, error) {
 	// 1. fetch and stitch
 	csvData, err := s.fetch(ctx, vars, start, end, step)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// 2. do counterfactual prediction
-	result, err := s.simulate(ctx, csvData, simulationArgs)
+	result, err := s.estimate(ctx, csvData, estimateArgs)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	return result, nil
@@ -150,8 +150,6 @@ func (s *Service) fetch(ctx context.Context, vars []variable.VariableDefinition,
 	writer.Flush()
 	bs := buf.Bytes()
 
-	log.Println(string(bs))
-
 	return bs, nil
 }
 
@@ -170,26 +168,24 @@ func (s *Service) discover(ctx context.Context, csvData []byte, discovery Discov
 	return graph, nil
 }
 
-func (s *Service) simulate(ctx context.Context, csvData []byte, simulation SimulationArgs) (string, error) {
-	req := &causal.SimulateRequest{
-		CsvData:         string(csvData),
-		Graph:           simulation.Graph,
-		Intervention:    simulation.Intervention,
-		SimulationSteps: simulation.Horizon,
+func (s *Service) estimate(ctx context.Context, csvData []byte, estimation EstimateArgs) (*causal.EstimateResponse, error) {
+	req := &causal.EstimateRequest{
+		CsvData: string(csvData),
+		Graph:   estimation.Graph,
 	}
 
-	rsp, err := s.simulator.Simulate(ctx, req)
+	rsp, err := s.estimator.Estimate(ctx, req)
 	if err != nil {
-		return "", fmt.Errorf("failed to perform counterfactual simulation: %w", err)
+		return nil, fmt.Errorf("failed to perform estimation: %w", err)
 	}
 
-	return rsp.JsonResults, nil
+	return rsp, nil
 }
 
-func New(fs map[string]map[string]fetcher.Fetcher, d discoverer.Discoverer, s simulator.Simulator) *Service {
+func New(fs map[string]map[string]fetcher.Fetcher, d discoverer.Discoverer, e estimator.Estimator) *Service {
 	return &Service{
 		fetchers:   fs,
 		discoverer: d,
-		simulator:  s,
+		estimator:  e,
 	}
 }
