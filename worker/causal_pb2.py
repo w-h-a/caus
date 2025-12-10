@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63\x61usal.proto\x12\x0f\x63\x61usal.v1alpha1\"F\n\x0f\x44iscoverRequest\x12\x10\n\x08\x63sv_data\x18\x01 \x01(\t\x12\x0f\n\x07max_lag\x18\x02 \x01(\x05\x12\x10\n\x08pc_alpha\x18\x03 \x01(\x02\"Y\n\x0b\x43\x61usalGraph\x12$\n\x05nodes\x18\x01 \x03(\x0b\x32\x15.causal.v1alpha1.Node\x12$\n\x05\x65\x64ges\x18\x02 \x03(\x0b\x32\x15.causal.v1alpha1.Edge\"!\n\x04Node\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05label\x18\x02 \x01(\t\"A\n\x04\x45\x64ge\x12\x0e\n\x06source\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\x12\x0b\n\x03lag\x18\x04 \x01(\x05\"\x9f\x01\n\x0fSimulateRequest\x12\x10\n\x08\x63sv_data\x18\x01 \x01(\t\x12+\n\x05graph\x18\x02 \x01(\x0b\x32\x1c.causal.v1alpha1.CausalGraph\x12\x33\n\x0cintervention\x18\x03 \x01(\x0b\x32\x1d.causal.v1alpha1.Intervention\x12\x18\n\x10simulation_steps\x18\x04 \x01(\x05\"T\n\x0cIntervention\x12\x13\n\x0btarget_node\x18\x01 \x01(\t\x12\x0e\n\x06\x61\x63tion\x18\x02 \x01(\t\x12\r\n\x05value\x18\x03 \x01(\x01\x12\x10\n\x08\x64uration\x18\x04 \x01(\x05\"(\n\x10SimulateResponse\x12\x14\n\x0cjson_results\x18\x01 \x01(\t2_\n\x0f\x43\x61usalDiscovery\x12L\n\x08\x44iscover\x12 .causal.v1alpha1.DiscoverRequest\x1a\x1c.causal.v1alpha1.CausalGraph\"\x00\x32\x65\n\x10\x43\x61usalSimulation\x12Q\n\x08Simulate\x12 .causal.v1alpha1.SimulateRequest\x1a!.causal.v1alpha1.SimulateResponse\"\x00\x42+Z)github.com/w-h-a/caus/api/causal/v1alpha1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0c\x63\x61usal.proto\x12\x0f\x63\x61usal.v1alpha1\"F\n\x0f\x44iscoverRequest\x12\x10\n\x08\x63sv_data\x18\x01 \x01(\t\x12\x0f\n\x07max_lag\x18\x02 \x01(\x05\x12\x10\n\x08pc_alpha\x18\x03 \x01(\x02\"Y\n\x0b\x43\x61usalGraph\x12$\n\x05nodes\x18\x01 \x03(\x0b\x32\x15.causal.v1alpha1.Node\x12$\n\x05\x65\x64ges\x18\x02 \x03(\x0b\x32\x15.causal.v1alpha1.Edge\"!\n\x04Node\x12\n\n\x02id\x18\x01 \x01(\x05\x12\r\n\x05label\x18\x02 \x01(\t\"A\n\x04\x45\x64ge\x12\x0e\n\x06source\x18\x01 \x01(\t\x12\x0e\n\x06target\x18\x02 \x01(\t\x12\x0c\n\x04type\x18\x03 \x01(\t\x12\x0b\n\x03lag\x18\x04 \x01(\x05\"P\n\x0f\x45stimateRequest\x12\x10\n\x08\x63sv_data\x18\x01 \x01(\t\x12+\n\x05graph\x18\x02 \x01(\x0b\x32\x1c.causal.v1alpha1.CausalGraph\"\x9c\x01\n\x10\x45stimateResponse\x12=\n\x06models\x18\x02 \x03(\x0b\x32-.causal.v1alpha1.EstimateResponse.ModelsEntry\x1aI\n\x0bModelsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12)\n\x05value\x18\x02 \x01(\x0b\x32\x1a.causal.v1alpha1.ModelInfo:\x02\x38\x01\"F\n\tModelInfo\x12\x10\n\x08\x66\x65\x61tures\x18\x01 \x03(\t\x12\x14\n\x0c\x63oefficients\x18\x02 \x03(\x02\x12\x11\n\tintercept\x18\x03 \x01(\x02\x32_\n\x0f\x43\x61usalDiscovery\x12L\n\x08\x44iscover\x12 .causal.v1alpha1.DiscoverRequest\x1a\x1c.causal.v1alpha1.CausalGraph\"\x00\x32\x65\n\x10\x43\x61usalEstimation\x12Q\n\x08\x45stimate\x12 .causal.v1alpha1.EstimateRequest\x1a!.causal.v1alpha1.EstimateResponse\"\x00\x42+Z)github.com/w-h-a/caus/api/causal/v1alpha1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,6 +32,8 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'causal_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   _globals['DESCRIPTOR']._loaded_options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z)github.com/w-h-a/caus/api/causal/v1alpha1'
+  _globals['_ESTIMATERESPONSE_MODELSENTRY']._loaded_options = None
+  _globals['_ESTIMATERESPONSE_MODELSENTRY']._serialized_options = b'8\001'
   _globals['_DISCOVERREQUEST']._serialized_start=33
   _globals['_DISCOVERREQUEST']._serialized_end=103
   _globals['_CAUSALGRAPH']._serialized_start=105
@@ -40,14 +42,16 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_NODE']._serialized_end=229
   _globals['_EDGE']._serialized_start=231
   _globals['_EDGE']._serialized_end=296
-  _globals['_SIMULATEREQUEST']._serialized_start=299
-  _globals['_SIMULATEREQUEST']._serialized_end=458
-  _globals['_INTERVENTION']._serialized_start=460
-  _globals['_INTERVENTION']._serialized_end=544
-  _globals['_SIMULATERESPONSE']._serialized_start=546
-  _globals['_SIMULATERESPONSE']._serialized_end=586
-  _globals['_CAUSALDISCOVERY']._serialized_start=588
-  _globals['_CAUSALDISCOVERY']._serialized_end=683
-  _globals['_CAUSALSIMULATION']._serialized_start=685
-  _globals['_CAUSALSIMULATION']._serialized_end=786
+  _globals['_ESTIMATEREQUEST']._serialized_start=298
+  _globals['_ESTIMATEREQUEST']._serialized_end=378
+  _globals['_ESTIMATERESPONSE']._serialized_start=381
+  _globals['_ESTIMATERESPONSE']._serialized_end=537
+  _globals['_ESTIMATERESPONSE_MODELSENTRY']._serialized_start=464
+  _globals['_ESTIMATERESPONSE_MODELSENTRY']._serialized_end=537
+  _globals['_MODELINFO']._serialized_start=539
+  _globals['_MODELINFO']._serialized_end=609
+  _globals['_CAUSALDISCOVERY']._serialized_start=611
+  _globals['_CAUSALDISCOVERY']._serialized_end=706
+  _globals['_CAUSALESTIMATION']._serialized_start=708
+  _globals['_CAUSALESTIMATION']._serialized_end=809
 # @@protoc_insertion_point(module_scope)

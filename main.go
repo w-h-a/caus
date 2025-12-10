@@ -59,18 +59,12 @@ func main() {
 				Action: cmd.Discover,
 			},
 			{
-				Name: "simulate",
+				Name: "estimate",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "graph",
 						Aliases:  []string{"g"},
 						Usage:    "Path to graph.json",
-						Required: true,
-					},
-					&cli.StringFlag{
-						Name:     "do",
-						Aliases:  []string{"d"},
-						Usage:    "Intervention on a variable (e.g., 'front_calls * 1.2' or 'front_calls = 200')",
 						Required: true,
 					},
 					&cli.StringFlag{
@@ -96,17 +90,8 @@ func main() {
 						Usage: "Data resolution (e.g., 1m, 15s)",
 						Value: time.Minute,
 					},
-					&cli.IntFlag{
-						Name:  "horizon",
-						Usage: "Number of steps for the counterfactual simulation (e.g., if step is 1m and horizon is 60, you will replace the last 60mins with a counterfactual history)",
-						Value: 60,
-					},
-					&cli.StringFlag{
-						Name:  "effect",
-						Usage: "Variable on which to focus counterfactual predictions (e.g., 'orders_cpu')",
-					},
 				},
-				Action: cmd.Simulate,
+				Action: cmd.Estimate,
 			},
 		},
 	}

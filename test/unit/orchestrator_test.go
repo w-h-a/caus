@@ -14,10 +14,10 @@ import (
 	variable "github.com/w-h-a/caus/api/variable/v1alpha1"
 	mockdiscoverer "github.com/w-h-a/caus/internal/client/discoverer/mock"
 	noopdisc "github.com/w-h-a/caus/internal/client/discoverer/noop"
+	mockestimator "github.com/w-h-a/caus/internal/client/estimator/mock"
+	noopest "github.com/w-h-a/caus/internal/client/estimator/noop"
 	"github.com/w-h-a/caus/internal/client/fetcher"
 	mockfetcher "github.com/w-h-a/caus/internal/client/fetcher/mock"
-	mocksimulator "github.com/w-h-a/caus/internal/client/simulator/mock"
-	noopsim "github.com/w-h-a/caus/internal/client/simulator/noop"
 	"github.com/w-h-a/caus/internal/service/orchestrator"
 )
 
@@ -56,13 +56,13 @@ func TestOrchestrator_Discover(t *testing.T) {
 
 	mDiscoverer := mockdiscoverer.NewDiscoverer()
 
-	nSimulator := noopsim.NewSimulator()
+	nEstimator := noopest.NewEstimator()
 
 	fetchers := map[string]map[string]fetcher.Fetcher{
 		"metrics": {"mock": mFetcher},
 	}
 
-	svc := orchestrator.New(fetchers, mDiscoverer, nSimulator)
+	svc := orchestrator.New(fetchers, mDiscoverer, nEstimator)
 
 	// Act
 	vars := []variable.VariableDefinition{
@@ -96,7 +96,7 @@ func TestOrchestrator_Discover(t *testing.T) {
 	assert.Equal(t, float32(0.05), req.PcAlpha)
 }
 
-func TestOrchestrator_Simulate(t *testing.T) {
+func TestOrchestrator_Estimate(t *testing.T) {
 	if len(os.Getenv("INTEGRATION")) > 0 {
 		t.Log("SKIPPING UNIT TEST")
 		return
@@ -125,13 +125,13 @@ func TestOrchestrator_Simulate(t *testing.T) {
 
 	nDiscoverer := noopdisc.NewDiscoverer()
 
-	mSimulator := mocksimulator.NewSimulator()
+	mEstimator := mockestimator.NewEstimator()
 
 	fetchers := map[string]map[string]fetcher.Fetcher{
 		"metrics": {"mock": mFetcher},
 	}
 
-	svc := orchestrator.New(fetchers, nDiscoverer, mSimulator)
+	svc := orchestrator.New(fetchers, nDiscoverer, mEstimator)
 
 	// Act
 	vars := []variable.VariableDefinition{
@@ -142,24 +142,15 @@ func TestOrchestrator_Simulate(t *testing.T) {
 		Nodes: []*causal.Node{{Id: 0, Label: "var_a"}},
 	}
 
-	intervention := &causal.Intervention{
-		TargetNode: "var_a",
-		Action:     "SET_TO_FIXED",
-		Value:      100.0,
-	}
-
-	_, err := svc.Simulate(context.Background(), vars, start, end, step, orchestrator.SimulationArgs{Graph: inputGraph, Intervention: intervention, Horizon: 60})
+	_, err := svc.Estimate(context.Background(), vars, start, end, step, orchestrator.EstimateArgs{Graph: inputGraph})
 	require.NoError(t, err)
 
 	// Assert
-	req := mSimulator.LastRequest()
+	req := mEstimator.LastRequest()
 	assert.NotNil(t, req)
 	assert.True(t, len(req.CsvData) > 0)
 	assert.True(t, len(req.Graph.Nodes) == 1)
 	assert.Equal(t, "var_a", req.Graph.Nodes[0].Label)
-	assert.Equal(t, "var_a", req.Intervention.TargetNode)
-	assert.Equal(t, 100.0, req.Intervention.Value)
-	assert.Equal(t, int32(60), req.SimulationSteps)
 }
 
 func TestOrchestrator_FetchAlignment(t *testing.T) {
@@ -177,13 +168,13 @@ func TestOrchestrator_FetchAlignment(t *testing.T) {
 
 	mDiscoverer := mockdiscoverer.NewDiscoverer()
 
-	nSimulator := noopsim.NewSimulator()
+	nEstimator := noopest.NewEstimator()
 
 	fetchers := map[string]map[string]fetcher.Fetcher{
 		"metrics": {"mock": mFetcher},
 	}
 
-	svc := orchestrator.New(fetchers, mDiscoverer, nSimulator)
+	svc := orchestrator.New(fetchers, mDiscoverer, nEstimator)
 
 	// Act
 	vars := []variable.VariableDefinition{

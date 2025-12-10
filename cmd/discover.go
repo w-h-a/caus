@@ -9,7 +9,7 @@ import (
 	causal "github.com/w-h-a/caus/api/causal/v1alpha1"
 	"github.com/w-h-a/caus/internal/client/discoverer"
 	"github.com/w-h-a/caus/internal/client/discoverer/v1alpha1"
-	"github.com/w-h-a/caus/internal/client/simulator/noop"
+	"github.com/w-h-a/caus/internal/client/estimator/noop"
 	"github.com/w-h-a/caus/internal/config"
 	"github.com/w-h-a/caus/internal/service/orchestrator"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -49,10 +49,10 @@ func Discover(c *cli.Context) error {
 		discoverer.WithLocation("localhost:50051"),
 	)
 
-	noopSimulator := noop.NewSimulator()
+	noopEstimator := noop.NewEstimator()
 
 	// 3. Build services
-	o := orchestrator.New(fetchers, v1alpha1Discoverer, noopSimulator)
+	o := orchestrator.New(fetchers, v1alpha1Discoverer, noopEstimator)
 
 	// 4. Run Discover
 	graph, err := o.Discover(

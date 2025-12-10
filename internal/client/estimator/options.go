@@ -1,4 +1,4 @@
-package simulator
+package estimator
 
 import "context"
 

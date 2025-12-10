@@ -8,8 +8,8 @@ service CausalDiscovery {
   rpc Discover(DiscoverRequest) returns (CausalGraph) {}
 }
 
-service CausalSimulation {
-  rpc Simulate(SimulateRequest) returns (SimulateResponse) {}
+service CausalEstimation {
+  rpc Estimate(EstimateRequest) returns (EstimateResponse) {}
 }
 
 message DiscoverRequest {
@@ -35,20 +35,17 @@ message Edge {
   int32 lag = 4;
 }
 
-message SimulateRequest {
+message EstimateRequest {
   string csv_data = 1;
   CausalGraph graph = 2;
-  Intervention intervention = 3;
-  int32  simulation_steps = 4;
 }
 
-message Intervention {
-  string target_node = 1;
-  string action = 2;
-  double value = 3;
-  int32 duration = 4;
+message EstimateResponse {
+  map<string, ModelInfo> models = 2;
 }
 
-message SimulateResponse {
-  string json_results = 1;
+message ModelInfo {
+  repeated string features = 1;
+  repeated float coefficients = 2;
+  float intercept = 3;
 }
